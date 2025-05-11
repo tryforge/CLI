@@ -1,0 +1,77 @@
+# Source files and development tools
+src/
+test/
+tests/
+__tests__/
+coverage/
+.vscode/
+.idea/
+*.sublime-*
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Source TypeScript files (we publish compiled JS)
+# Keep .d.ts files for TypeScript definitions
+*.ts
+!*.d.ts
+*.tsx
+*.map
+*.tsbuildinfo
+
+# Config and meta files
+.eslintrc*
+.eslintignore
+.prettierrc*
+.prettierignore
+tsconfig*.json
+jest.config.*
+*.config.js
+*.config.ts
+.editorconfig
+.mocharc.json
+.nycrc
+.travis.yml
+.gitlab-ci.yml
+.github/
+
+# Development folders
+scripts/
+examples/
+metadata/
+docs/
+.cache/
+test-results/
+playwright-report/
+blob-report/
+playwright/
+
+# Local and environment-specific files
+.env
+.env.*
+*.local
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+.gitignore
+
+# Documentation - CHANGE: Keep essential docs for npm
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+# Keep the following files for npm package
+!README.md
+!LICENSE.md
+!CHANGELOG.md
+
+# Lockfiles
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Testing configs
+jest.setup.*
+jest.config.*
