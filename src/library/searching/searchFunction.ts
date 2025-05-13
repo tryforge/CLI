@@ -17,7 +17,7 @@ import type { IFunction, IFileMetadata, IFunctionMetadata } from "@/types";
  *   - The found IFunction object if a match was found
  *   - The provided default value (of type T) if no match was found
  * @async
- * @since 1.0.0
+ * @since 0.0.1
  */
 export async function SearchFunction<T>(
   data: IFunction[], 

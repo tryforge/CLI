@@ -15,7 +15,7 @@ import type { IFileMetadata, IFunctionMetadata } from "@/types";
  * @throws {Error} Throws an error if the HTTP request fails or if the response cannot be parsed
  * 
  * @async
- * @since 1.0.0
+ * @since 0.0.1
  */
 export async function RequestFunctions(extension?: string): Promise<any> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
