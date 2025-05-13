@@ -5,11 +5,13 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/cache/*": ["./.cache/*"]
     }
   },
   "include": ["src/**/*.ts"]

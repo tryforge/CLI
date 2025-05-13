@@ -1,6 +1,5 @@
 # Core Node/TypeScript ignore
 node_modules/
-dist/
 build/
 *.tsbuildinfo
 .cache/
