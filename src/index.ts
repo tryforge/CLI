@@ -13,6 +13,7 @@
 
 import { Command } from 'commander';
 import { IFileMetadata } from '@/types';
+import { version as version } from '../package.json';
 
 /**
  * Importing the commands from the source folder.
@@ -35,7 +36,7 @@ const ForgeCLI: Command = new Command();
 ForgeCLI
   .name('forge')
   .description('A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.')
-  .version('0.0.1');
+  .version(version);
 
 /**
  * Adding the commands to the BotForge command line interface.

@@ -36,6 +36,10 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 var import_commander3 = require("commander");
 
+// package.json
+var name = "@tryforge/forge.cli";
+var version = "0.0.1";
+
 // src/commands/search/search.ts
 var import_chalk = __toESM(require("chalk"));
 var import_commander = require("commander");
@@ -94,12 +98,6 @@ var Search = new import_commander.Command("search").description("Search for a sp
 var import_chalk2 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
 var import_ora = __toESM(require("ora"));
-
-// package.json
-var name = "@tryforge/forge.cli";
-var version = "2.3.0";
-
-// src/commands/system/version.ts
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk2.default.cyan(version)}
 `);
@@ -126,7 +124,7 @@ var Version = new import_commander2.Command("version").description("Returns the 
 
 // src/index.ts
 var ForgeCLI = new import_commander3.Command();
-ForgeCLI.name("forge").description("A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.").version("0.0.1");
+ForgeCLI.name("forge").description("A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.").version(version);
 ForgeCLI.addCommand(Search);
 ForgeCLI.addCommand(Version);
 ForgeCLI.parseAsync(process.argv);
