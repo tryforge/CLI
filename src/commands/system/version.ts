@@ -25,7 +25,7 @@ export const Version: Command = new Command('version')
     const spinner = ora('Checking for updates...').start();
 
     try {
-      const response = await fetch(`https://registry.npmjs.org/@tryforge/forgescript`);
+      const response = await fetch(`https://registry.npmjs.org/@tryforge/cli`);
       const data = await response.json();
       const latestVersion = data['dist-tags'].latest;
 
