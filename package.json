@@ -1,5 +1,5 @@
 {
-  "name": "@tryforge/forge.cli",
+  "name": "@tryforge/cli",
   "version": "0.0.1",
   "description": "A powerful CLI tool for BotForge & ForgeScript to bootstrap projects, scaffold command files, generate templates, and simplify script setups.",
   "main": "dist/index.js",
@@ -51,14 +51,17 @@
     "CONTRIBUTE.md"
   ],
   "devDependencies": {
+    "@eslint/js": "^9.26.0",
     "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^9.0.0",
+    "globals": "^16.1.0",
     "nodemon": "^3.0.2",
     "ts-node": "^10.9.2",
     "tsup": "^8.4.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.32.1"
   },
   "dependencies": {
     "chalk": "^5.3.0",

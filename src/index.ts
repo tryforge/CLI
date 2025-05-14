@@ -1,12 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * ForgeScript CLI
+ * BotForge CLI
  * 
  * A command-line interface tool for ForgeScript and BotForge that helps developers 
  * quickly set up projects, create scripts, and streamline their workflow.
  * 
- * @module forge-cli
+ * @module forge
  * @version 0.0.1
 */
 

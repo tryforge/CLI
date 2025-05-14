@@ -1,4 +1,4 @@
-import type { IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFileMetadata, IFunction, IFunctionMetadata } from "@/types";
 
 /**
  * Fetches function metadata from GitHub repositories based on the specified extension.
@@ -17,10 +17,8 @@ import type { IFileMetadata, IFunctionMetadata } from "@/types";
  * @async
  * @since 0.0.1
  */
-export async function RequestFunctions(extension?: string): Promise<any> {
+export async function RequestFunctions(extension?: string): Promise<IFunction[]> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
-  
-  // Map extension names to their repository paths
   const ExtensionRepos: Record<string, string> = {
     'forgedb': 'ForgeDB',
     'forgecanvas': 'ForgeCanvas',
@@ -28,7 +26,6 @@ export async function RequestFunctions(extension?: string): Promise<any> {
     'forgescript': 'ForgeScript'
   };
   
-  // Use the mapped repository or default to ForgeScript
   const RepositoryName = ExtensionRepos[ExtensionName] || 'ForgeScript';
   const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/main/metadata/functions.json`;
   

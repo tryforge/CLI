@@ -45,7 +45,6 @@ interface IFileMetadata {
 interface IFunctionMetadata {
     /**
      * The name of the function.
-     * Example: "handleRequest"
      */
     name: string;
     /**
@@ -79,7 +78,6 @@ interface IFunctionMetadata {
 interface IParameterMetadata {
     /**
      * The name of the parameter.
-     * Example: "userId"
      */
     name: string;
     /**
@@ -101,12 +99,12 @@ interface IParameterMetadata {
 }
 
 /**
- * ForgeScript CLI
+ * BotForge CLI
  *
  * A command-line interface tool for ForgeScript and BotForge that helps developers
  * quickly set up projects, create scripts, and streamline their workflow.
  *
- * @module forge-cli
+ * @module forge
  * @version 0.0.1
 */
 

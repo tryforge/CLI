@@ -24,14 +24,14 @@ export async function SearchFunction<T>(
   targetName: string, 
   defaultValue: T
 ): Promise<IFunction | T> {
-  const lowerTarget = targetName.toLowerCase();
+  const LowerTarget = targetName.toLowerCase();
 
-  const result = data.find(item =>
-    item.name?.toLowerCase() === lowerTarget ||
-    item.aliases?.some(alias => alias.toLowerCase() === lowerTarget)
+  const Result = data.find(item =>
+    item.name?.toLowerCase() === LowerTarget ||
+    item.aliases?.some(alias => alias.toLowerCase() === LowerTarget)
   );
 
-  return result || defaultValue;
+  return Result || defaultValue;
 }
 
 

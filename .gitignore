@@ -1,4 +1,4 @@
-# Core Node/TypeScript ignore
+# Core
 node_modules/
 build/
 *.tsbuildinfo
@@ -29,7 +29,7 @@ playwright/.cache/
 *.env.*
 
 # Dependency & lock files
-# NOTE: Tracking lock files in Git for reproducible builds
+# Tracking lock files in Git for reproducible builds
 # pnpm-lock.yaml
 # yarn.lock
 # package-lock.json
@@ -63,6 +63,6 @@ tmp/
 # Git
 .git/
 
-# Build artifacts
+# Build
 /*.tgz
 /out/

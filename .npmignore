@@ -1,4 +1,4 @@
-# Source files and development tools
+# Source
 src/
 test/
 tests/
@@ -12,8 +12,7 @@ coverage/
 *.bak
 *.swp
 
-# Source TypeScript files (we publish compiled JS)
-# Keep .d.ts files for TypeScript definitions
+# Source TypeScript files
 *.ts
 !*.d.ts
 *.tsx
@@ -47,7 +46,7 @@ playwright-report/
 blob-report/
 playwright/
 
-# Local and environment-specific files
+# Local and environment
 .env
 .env.*
 *.local
@@ -58,11 +57,11 @@ Thumbs.db
 .git/
 .gitignore
 
-# Documentation - CHANGE: Keep essential docs for npm
+# Documentation
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 SECURITY.md
-# Keep the following files for npm package
+# Keep
 !README.md
 !LICENSE.md
 !CHANGELOG.md

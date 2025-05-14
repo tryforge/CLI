@@ -24,6 +24,11 @@ export interface ICommandMetadata {
   options?: ICommandOption[];
 
   /**
+   * A list of available arguments the command accepts.
+   */
+  arguments?: ICommandArgument[];
+
+  /**
    * A list of aliases for the command.
    */
   aliases?: string[]
@@ -60,6 +65,31 @@ export interface ICommandOption {
 
   /**
    * The default value used if the flag is not explicitly provided.
+   */
+  defaultValue?: string;
+}
+
+/**
+ * Represents a single argument that can be passed to a CLI command.
+ */
+export interface ICommandArgument {
+  /**
+   * The full argument syntax used in the CLI.
+   */
+  flag: string;
+
+  /**
+   * A description of what the argument does.
+   */
+  description: string;
+
+  /**
+   * Indicates whether the argument is required for the command to run.
+   */
+  required?: boolean;
+
+  /**
+   * The default value used if the argument is not explicitly provided.
    */
   defaultValue?: string;
 }

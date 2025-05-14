@@ -5,7 +5,6 @@
 export interface IFunctionMetadata {
   /**
    * The name of the function.
-   * Example: "handleRequest"
    */
   name: string;
 
@@ -46,7 +45,6 @@ export interface IFunctionMetadata {
 export interface IParameterMetadata {
   /**
    * The name of the parameter.
-   * Example: "userId"
    */
   name: string;
 
