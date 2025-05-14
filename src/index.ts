@@ -13,7 +13,7 @@
 
 import { Command } from 'commander';
 import { IFileMetadata } from '@/types';
-import { version as version } from '../package.json';
+import { version } from '../package.json';
 
 /**
  * Importing the commands from the source folder.
@@ -58,7 +58,6 @@ ForgeCLI.parseAsync(process.argv);
  */
 export const FileMetadata_index: IFileMetadata = {
   filename: 'index.ts',
-  path: './dist/src/index.ts',
   createdAt: new Date('2025-05-11T18:58:00+02:00'),
   updatedAt: new Date('2025-05-13T16:38:00+02:00'),
   author: 'Sébastien (@striatp)',

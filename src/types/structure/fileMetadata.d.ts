@@ -11,11 +11,6 @@ export interface IFileMetadata {
   filename: string;
 
   /**
-   * The full relative or absolute path to the file.
-   */
-  path: string;
-
-  /**
    * The date and time when the file was initially created.
    */
   createdAt: Date;

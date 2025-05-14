@@ -25,7 +25,6 @@ export async function LatestVersion(current_version: string): Promise<boolean> {
  */
 export const FileMetadata_latestVersion: IFileMetadata = {
   filename: 'latestVersion.ts',
-  path: './dist/src/library/system/latestVersion.ts',
   createdAt: new Date('2025-05-13T17:18:00+02:00'),
   updatedAt: new Date('2025-05-14T14:14:00+02:00'),
   author: 'Sébastien (@striatp)',

@@ -49,7 +49,6 @@ export async function RequestEnums(extension?: string): Promise<Record<string, s
  */
 export const FileMetadata_requestEnums: IFileMetadata = {
   filename: 'requestEnums.ts',
-  path: './dist/src/library/seearching/requestEnums.ts',
   createdAt: new Date('2025-05-11T14:22:00+02:00'),
   updatedAt: new Date('2025-05-13T17:30:00+02:00'),
   author: 'Sébastien (@striatp)',

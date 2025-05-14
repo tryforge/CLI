@@ -49,7 +49,6 @@ export async function RequestEvents(extension?: string): Promise<IEvent[]> {
  */
 export const FileMetadata_requestEvents: IFileMetadata = {
   filename: 'requestEvents.ts',
-  path: './dist/src/library/seearching/requestEvents.ts',
   createdAt: new Date('2025-05-11T14:22:00+02:00'),
   updatedAt: new Date('2025-05-13T17:30:00+02:00'),
   author: 'Sébastien (@striatp)',

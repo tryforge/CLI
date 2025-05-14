@@ -226,7 +226,6 @@ ForgeCLI.addCommand(Version);
 ForgeCLI.parseAsync(process.argv);
 var FileMetadata_index = {
   filename: "index.ts",
-  path: "./dist/src/index.ts",
   createdAt: /* @__PURE__ */ new Date("2025-05-11T18:58:00+02:00"),
   updatedAt: /* @__PURE__ */ new Date("2025-05-13T16:38:00+02:00"),
   author: "S\xE9bastien (@striatp)",

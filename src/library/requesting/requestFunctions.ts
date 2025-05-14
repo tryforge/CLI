@@ -49,7 +49,6 @@ export async function RequestFunctions(extension?: string): Promise<IFunction[]>
  */
 export const FileMetadata_requestFunctions: IFileMetadata = {
   filename: 'requestFunctions.ts',
-  path: './dist/src/library/seearching/requestFunctions.ts',
   createdAt: new Date('2025-05-11T14:22:00+02:00'),
   updatedAt: new Date('2025-05-13T17:30:00+02:00'),
   author: 'Sébastien (@striatp)',
