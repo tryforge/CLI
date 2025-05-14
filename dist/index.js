@@ -42,6 +42,7 @@ var version = "0.0.1";
 
 // src/commands/search/search.ts
 var import_chalk = __toESM(require("chalk"));
+var import_ora = __toESM(require("ora"));
 var import_commander = require("commander");
 
 // src/library/searching/requestFunctions.ts
@@ -77,13 +78,15 @@ async function SearchFunction(data, targetName, defaultValue) {
 }
 
 // src/commands/search/search.ts
-var Search = new import_commander.Command("search").description("Search for a specific function, enum or event through BotForge's documentation.").argument("<type>", "The type of object to search for ('function', 'event' or 'enum'. Case unsensitive).").argument("<object>", "The object to search for (Case unsensitive).").option("-e, --extension <extension>", "Specify a extension where to search.").action(async (type, object, options) => {
+var Search = new import_commander.Command("search").description("Search for a specific function, enum or event through BotForge's documentation.").argument("<type>", "The type of object to search for ('function', 'event' or 'enum'. Case insensitive).").argument("<object>", "The object to search for (Case insensitive).").option("-e, --extension <extension>", "Specify an extension where to search.").action(async (type, object, options) => {
   const Type = type.toLowerCase();
   const Object2 = object.toLowerCase();
+  const spinner = (0, import_ora.default)(`Retrieving the ${type}...`).start();
   const ValidTypes = ["function", "event", "enum"];
   if (ValidTypes.includes(Type)) {
     const functions = await RequestFunctions(options.extension);
     const result = await SearchFunction(functions, Object2, null);
+    spinner.stop();
     if (result) {
       console.log(result);
     } else {
@@ -97,11 +100,11 @@ var Search = new import_commander.Command("search").description("Search for a sp
 // src/commands/system/version.ts
 var import_chalk2 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
-var import_ora = __toESM(require("ora"));
+var import_ora2 = __toESM(require("ora"));
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk2.default.cyan(version)}
 `);
-  const spinner = (0, import_ora.default)("Checking for updates...").start();
+  const spinner = (0, import_ora2.default)("Checking for updates...").start();
   try {
     const response = await fetch(`https://registry.npmjs.org/@tryforge/forgescript`);
     const data = await response.json();
