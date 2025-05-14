@@ -1,4 +1,4 @@
-import type { IEnum, IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFileMetadata, IFunctionMetadata } from "@/types";
 
 /**
  * Searches for matching enum entries by name in the provided enum object
@@ -8,7 +8,7 @@ import type { IEnum, IFileMetadata, IFunctionMetadata } from "@/types";
  * 
  * @template T - The type of the default value to return if no match is found
  * 
- * @param {IEnum} data - The enum object to search through
+ * @param {IEnum[]} data - The enum object to search through
  * @param {string} targetName - The name to search for
  * @param {T} defaultValue - The default value to return if no matches are found
  * 
@@ -20,11 +20,12 @@ import type { IEnum, IFileMetadata, IFunctionMetadata } from "@/types";
  * @since 0.0.1
  */
 export async function SearchEnum<T>(
-  data: IEnum,
+  data: Record<string, string[]>,
   targetName: string,
   defaultValue: T
 ): Promise<string[] | T> {
   const lowerTarget = targetName.toLowerCase();
+
   const lowercaseData = Object.keys(data).reduce((acc, key) => {
     acc[key.toLowerCase()] = data[key];
     return acc;
@@ -42,7 +43,6 @@ export async function SearchEnum<T>(
 
   return defaultValue;
 }
-
 
 /**
  * Metadata about the current file.

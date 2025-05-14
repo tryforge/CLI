@@ -165,8 +165,7 @@ var Search = new import_commander.Command("search").aliases(["s", "lookup", "lu"
         result = await SearchFunction(datas, lowerObject, null);
       } else if (lowerType === "enum" || lowerType === "en" || lowerType === "n") {
         const datas = await RequestEnums(options.extension);
-        const mergedEnum = Object.assign({}, ...datas);
-        result = await SearchEnum(mergedEnum, lowerObject, null);
+        result = await SearchEnum(datas, lowerObject, null);
       } else if (lowerType === "event" || lowerType === "e") {
         const datas = await RequestEvents(options.extension);
         result = await SearchEvents(datas, lowerObject, null);
@@ -200,7 +199,7 @@ var Version = new import_commander2.Command("version").description("Returns the 
 `);
   const spinner = (0, import_ora2.default)("Checking for updates...").start();
   try {
-    const response = await fetch(`https://registry.npmjs.org/@tryforge/forgescript`);
+    const response = await fetch(`https://registry.npmjs.org/@tryforge/cli`);
     const data = await response.json();
     const latestVersion = data["dist-tags"].latest;
     spinner.stop();

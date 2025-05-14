@@ -50,8 +50,7 @@ export const Search: Command = new Command('search')
           result = await SearchFunction(datas, lowerObject, null);
         } else if (lowerType === 'enum' || lowerType === 'en' || lowerType === 'n') {
           const datas = await RequestEnums(options.extension);
-          const mergedEnum: IEnum = Object.assign({}, ...datas);
-          result = await SearchEnum(mergedEnum, lowerObject, null);
+          result = await SearchEnum(datas, lowerObject, null);
         } else if (lowerType === 'event' || lowerType === 'e') {
           const datas = await RequestEvents(options.extension);
           result = await SearchEvents(datas, lowerObject, null);

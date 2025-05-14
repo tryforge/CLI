@@ -17,7 +17,7 @@ import type { IEnum, IFileMetadata, IFunctionMetadata } from "@/types";
  * @async
  * @since 0.0.1
  */
-export async function RequestEnums(extension?: string): Promise<IEnum[]> {
+export async function RequestEnums(extension?: string): Promise<Record<string, string[]>> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
   const ExtensionRepos: Record<string, string> = {
     'forgedb': 'ForgeDB',
