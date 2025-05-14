@@ -1,4 +1,4 @@
-import type { IEnum, IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFileMetadata, IFunctionMetadata } from "@/types";
 
 /**
  * Fetches enum metadata from GitHub repositories based on the specified extension.
