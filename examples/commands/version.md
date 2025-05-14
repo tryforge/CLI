@@ -14,11 +14,20 @@ forge version
 
 #### 🖥 Output Example
 
-![ForgeCLI Version Command Output](../../assets/command_examples/version_command.png)
+```bash
+Current version: 1.0.0
+
+You are using the latest version.
+```
 
 If a new version is available:
 
-![ForgeCLI Version Command Output](../../assets/command_examples/version_command_2.png)
+```bash
+Current version: 1.0.0
+
+A new version is available! 1.0.0 → 1.0.1
+Run pnpm i -g @tryforge/cli@latest to update.
+```
 
 ---
 
