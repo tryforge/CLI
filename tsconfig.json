@@ -9,10 +9,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/cache/*": ["./.cache/*"]
-    }
   },
   "include": ["src/**/*.ts"]
 }

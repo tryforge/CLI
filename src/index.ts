@@ -12,13 +12,13 @@
 
 
 import { Command } from 'commander';
-import { IFileMetadata } from '@/types';
+import { IFileMetadata } from './types';
 import { version } from '../package.json';
 
 /**
  * Importing the commands from the source folder.
 */
-import { Search, Version } from '@/commands';
+import { Search, Version } from './commands';
 
 /**
  * The main CLI instance for the Forge tool.

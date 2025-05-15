@@ -1,5 +1,5 @@
-import { IFileMetadata, IFunctionMetadata } from '@/types';
-import { name as packageName } from '../../../package.json';
+import { name } from '../../../package.json';
+import type { IFileMetadata, IFunctionMetadata } from '../../types';
 
 /**
  * Checks if the currently installed version is the latest available on npm.
@@ -9,7 +9,7 @@ import { name as packageName } from '../../../package.json';
  */
 export async function LatestVersion(current_version: string): Promise<boolean> {
   try {
-    const Response = await fetch(`https://registry.npmjs.org/${packageName}`);
+    const Response = await fetch(`https://registry.npmjs.org/${name}`);
     const Data = await Response.json();
     const LatestVersion = Data['dist-tags'].latest;
 

@@ -1,4 +1,4 @@
-import type { IFunction, IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFunction, IFileMetadata, IFunctionMetadata } from "../../types";
 
 /**
  * Searches for a function in an array by name and returns it or a default value.
@@ -41,7 +41,6 @@ export async function SearchFunction<T>(
  */
 export const FileMetadata_searchFunction: IFileMetadata = {
   filename: 'searchFunction.ts',
-  path: './dist/src/library/searching/searchFunction.ts',
   createdAt: new Date('2025-05-11T17:14:00+02:00'),
   updatedAt: new Date('2025-05-13T17:14:00+02:00'),
   author: 'Sébastien (@striatp)',

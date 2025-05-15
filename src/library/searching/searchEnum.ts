@@ -1,4 +1,4 @@
-import type { IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFileMetadata, IFunctionMetadata } from "../../types";
 
 /**
  * Searches for matching enum entries by name in the provided enum object
@@ -23,24 +23,22 @@ export async function SearchEnum<T>(
   data: Record<string, string[]>,
   targetName: string,
   defaultValue: T
-): Promise<string[] | T> {
-  const lowerTarget = targetName.toLowerCase();
-
-  const lowercaseData = Object.keys(data).reduce((acc, key) => {
-    acc[key.toLowerCase()] = data[key];
-    return acc;
-  }, {} as Record<string, string[]>);
-
-  if (lowercaseData[lowerTarget]) {
-    return lowercaseData[lowerTarget];
+): Promise<string[] | T | null> {
+  // Look for the exact case
+  if (targetName in data) {
+    return data[targetName];
   }
-
-  for (const key in lowercaseData) {
-    if (lowercaseData[key].some(value => value.toLowerCase() === lowerTarget)) {
-      return lowercaseData[key];
+  
+  // Look for case-insensitive match
+  const normalizedTargetName = targetName.replace(/^\$/, ''); // Remove $ prefix if present
+  
+  for (const key of Object.keys(data)) {
+    if (key.toLowerCase() === normalizedTargetName.toLowerCase()) {
+      return data[key];
     }
   }
-
+  
+  // Return default value if not found
   return defaultValue;
 }
 
@@ -50,7 +48,6 @@ export async function SearchEnum<T>(
  */
 export const FileMetadata_searchEnum: IFileMetadata = {
   filename: 'searchEnum.ts',
-  path: './dist/src/library/searching/searchEnum.ts',
   createdAt: new Date('2025-05-11T17:14:00+02:00'),
   updatedAt: new Date('2025-05-13T17:14:00+02:00'),
   author: 'Sébastien (@striatp)',

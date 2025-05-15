@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import ora from 'ora';
 import { version as currentVersion, name as packageName } from '../../../package.json';
-import type { ICommandMetadata, IFileMetadata } from '@/types';
+import type { ICommandMetadata, IFileMetadata } from '../../types';
 
 /**
  * Prints the current CLI version and checks for updates from the npm registry.
@@ -51,7 +51,6 @@ export const Version: Command = new Command('version')
  */
 export const FileMetadata_version: IFileMetadata = {
   filename: 'version.ts',
-  path: './src/commands/system/version.ts',
   createdAt: new Date('2025-05-11T15:45:00+02:00'),
   updatedAt: new Date('2025-05-13T18:10:00+02:00'),
   author: 'Sébastien (@striatp)',

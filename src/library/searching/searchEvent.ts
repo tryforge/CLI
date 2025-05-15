@@ -1,4 +1,4 @@
-import type { IEvent, IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IEvent, IFileMetadata, IFunctionMetadata } from "../../types";
 
 /**
  * Searches for matching events by name in the provided event data.
@@ -19,7 +19,7 @@ import type { IEvent, IFileMetadata, IFunctionMetadata } from "@/types";
  * @async
  * @since 0.0.1
  */
-export async function SearchEvents<T>(
+export async function SearchEvent<T>(
   data: IEvent[],
   targetName: string,
   defaultValue: T
@@ -37,7 +37,6 @@ export async function SearchEvents<T>(
  */
 export const FileMetadata_searchEvent: IFileMetadata = {
   filename: 'searchEvent.ts',
-  path: './dist/src/library/searching/searchEnum.ts',
   createdAt: new Date('2025-05-11T17:14:00+02:00'),
   updatedAt: new Date('2025-05-13T17:14:00+02:00'),
   author: 'Sébastien (@striatp)',

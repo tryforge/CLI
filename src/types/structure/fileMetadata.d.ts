@@ -1,4 +1,4 @@
-import type { IFunctionMetadata } from '@/types';
+import type { IFunctionMetadata } from './functionMetadata';
 
 /**
  * Represents metadata associated with a specific file in the project.

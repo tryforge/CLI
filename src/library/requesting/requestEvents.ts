@@ -1,4 +1,4 @@
-import type { IEvent, IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IEvent, IFileMetadata, IFunctionMetadata } from "../../types";
 
 /**
  * Fetches event metadata from GitHub repositories based on the specified extension.
@@ -17,7 +17,7 @@ import type { IEvent, IFileMetadata, IFunctionMetadata } from "@/types";
  * @async
  * @since 0.0.1
  */
-export async function RequestEvents(extension?: string): Promise<IEvent[]> {
+export async function RequestEvents(extension?: string, dev?: boolean, forceFetch?: boolean): Promise<IEvent[]> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
   const ExtensionRepos: Record<string, string> = {
     'forgedb': 'ForgeDB',
@@ -27,7 +27,7 @@ export async function RequestEvents(extension?: string): Promise<IEvent[]> {
   };
   
   const RepositoryName = ExtensionRepos[ExtensionName] || 'ForgeScript';
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/main/metadata/events.json`;
+  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? 'dev' : 'main'}/metadata/events.json`;
   
   try {
     const Response = await fetch(url);

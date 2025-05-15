@@ -1,9 +1,9 @@
 // Exporting structure-related types
-export * from './structure/commandMetadata';
-export * from './structure/fileMetadata';
-export * from './structure/functionMetadata';
+export type * from './structure/commandMetadata';
+export type * from './structure/fileMetadata';
+export type * from './structure/functionMetadata';
 
 // Exporting interfaces
-export * from './interfaces/function';
-export * from './interfaces/enum';
-export * from './interfaces/events';
+export type * from './interfaces/function';
+export type * from './interfaces/enum';
+export type * from './interfaces/events';

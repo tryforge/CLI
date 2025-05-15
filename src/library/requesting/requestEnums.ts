@@ -1,4 +1,4 @@
-import type { IFileMetadata, IFunctionMetadata } from "@/types";
+import type { IFileMetadata, IFunctionMetadata } from "../../types";
 
 /**
  * Fetches enum metadata from GitHub repositories based on the specified extension.
@@ -17,7 +17,7 @@ import type { IFileMetadata, IFunctionMetadata } from "@/types";
  * @async
  * @since 0.0.1
  */
-export async function RequestEnums(extension?: string): Promise<Record<string, string[]>> {
+export async function RequestEnums(extension?: string, dev?: boolean, forceFetch?: boolean): Promise<Record<string, string[]>> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
   const ExtensionRepos: Record<string, string> = {
     'forgedb': 'ForgeDB',
@@ -27,7 +27,7 @@ export async function RequestEnums(extension?: string): Promise<Record<string, s
   };
   
   const RepositoryName = ExtensionRepos[ExtensionName] || 'ForgeScript';
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/main/metadata/enums.json`;
+  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? 'dev' : 'main'}/metadata/enums.json`;
   
   try {
     const Response = await fetch(url);
