@@ -2,101 +2,69 @@ import chalk from 'chalk';
 import ora, { Ora } from 'ora';
 import { Command } from 'commander';
 
-import { RequestEnums, RequestEvents, RequestFunctions, SearchEnum, SearchEvent, SearchFunction } from '../../library';
-import type { ICommandMetadata, IEvent, IFileMetadata, IFunction } from '../../types';
-
-/**
- * Represents a valid search type option for BotForge object types.
- */
-type SearchType = 'function' | 'event' | 'enum';
+import { RequestMetadata, SearchMetadata } from '../../library';
+import type { ICommandMetadata, IEvent, IFileMetadata, IFunction, SearchResult, SearchType } from '../../types';
 
 /**
  * Valid search type options for BotForge object types.
- * Maps normalized search types to their canonical form.
  */
 const ValidSearchTypes: Record<string, SearchType> = {
-  'function': 'function',
-  'f': 'function',
-  'fn': 'function',
-  'func': 'function',
-  'event': 'event',
-  'e': 'event',
-  'ev': 'event',
-  'evt': 'event',
-  'enum': 'enum',
-  'en': 'enum',
-  'n': 'enum',
-  'enm': 'enum'
+  'function': 'function', 'f': 'function', 'fn': 'function', 'func': 'function',
+  'event': 'event', 'e': 'event', 'ev': 'event', 'evt': 'event',
+  'enum': 'enum', 'en': 'enum', 'n': 'enum', 'enm': 'enum'
 };
 
 /**
  * Interface for the search command options.
  */
 interface SearchOptions {
-  extension?: string,
-  json?: boolean,
-  raw?: boolean,
-  fuzzy?: boolean,
-  dev?: boolean,
-  force?: boolean,
+  extension?: string, /* -e */
+  raw?: boolean, /* -r */
+  dev?: boolean, /* -d */
+  fetch?: boolean,
   debug?: boolean
-}
-
-/**
- * Interface for the search result object.
- */
-type SearchResult = IFunction | IEvent | string[] | null;
+};
 
 /**
  * Validates if the provided type string is a valid BotForge object type.
  */
 function IsValidType(type: string): boolean {
   return Object.keys(ValidSearchTypes).includes(type.toLowerCase());
-}
+};
 
 /**
  * Normalizes an object name for searching by converting to lowercase and removing any non-alphanumeric or underscore characters.
  */
 function NormalizeObjectName(objectName: string): string {
   return objectName.toLowerCase().replace(/[^a-zA-Z0-9_]/g, '');
-}
+};
 
 /**
  * Prepares an object name for searching based on its type.
- * Prepends '$' to function names as per BotForge conventions.
  */
-function PrepareObjectName(objectName: string, searchType: 'function' | 'event' | 'enum'): string {
+function PrepareObjectName(
+  objectName: string,
+  searchType: SearchType
+): string {
   return (searchType === 'function') ? `$${objectName}` : objectName;
-}
+};
 
 /**
  * Executes the search for a BotForge object based on type and name.
- * 
- * @param {string} normalizedType - The canonical search type ('function', 'event', or 'enum')
- * @param {string} preparedObjectName - The prepared object name for searching
- * @param {string | undefined} extension - Optional extension name to limit the search scope
- * @returns {Promise<IFunction | IEvent | string[] | null>} - The search result object or null if not found
  */
 async function ExecuteSearch(
   normalizedType: SearchType,
   preparedObjectName: string,
   extension?: string,
-  dev?: boolean
-): Promise<IFunction | IEvent | string[] /* Enum */ | null> {
-  switch (normalizedType) {
-    case 'function':
-      const functions = await RequestFunctions(extension, !!dev);
-      return SearchFunction(functions, preparedObjectName, null);
-    
-    case 'enum':
-      const enums = await RequestEnums(extension, !!dev);
-      return SearchEnum(enums, preparedObjectName, null);
-    
-    case 'event':
-      const events = await RequestEvents(extension, !!dev);
-      return SearchEvent(events, preparedObjectName, null);
-  }
-}
+  dev?: boolean,
+  debug?: boolean,
+  forceFetch?: boolean
+): Promise<SearchResult> {
+  debug ? console.log(`${chalk.yellow('[DEBUG]')} Starting the search.`) : null
+  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!forceFetch, !!debug);
+  
+  return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
+};
 
 /**
  * Searches for a specific function, enum, or event in BotForge's documentation.
@@ -107,27 +75,26 @@ async function ExecuteSearch(
  * formatted output or raw JSON based on user preference.
  *
  * @command search
- * @alias s, lookup, lu
- * @argument {string} type - The type of BotForge object to search for (function, event, enum)
- * @argument {string} object - The name of the object to search for
- * @option {string} extension - Specify a particular extension to limit the search scope
- * @option {boolean} json - Output the result as raw JSON instead of formatted text
- * @example forge search function sendMessage - Search for the $sendMessage function
- * @example forge search event onReady - Search for the $onReady event
- * @example forge search enum LogLevel --extension forgedb - Search for the LogLevel enum in the forgedb extension
+ * @alias s, lookup
+ * @argument {string} type - The type of object to search for (or their shortcuts).
+ * @argument {string} object - The object name to search for (case insensitive).
+ * @option {string} extension - Specify an extension to limit the search scope.
+ * @option {boolean} raw - Output the result as raw JSON instead of formatted text.
+ * @option {boolean} dev - Perform your research on the development branch.
+ * @option {boolean} debug - Show debug information during the search process.
+ * @option {boolean} fetch - Fetch information using HTTP request and forces to cache the results.
  * @since 0.0.1
  */
 export const Search: Command = new Command('search')
-  .aliases(['s', 'lookup', 'lu'])
-  .description("Search for a specific function, enum or event in BotForge's documentation.")
-  .argument('<type>', "The type of object to search for ('function | f', 'event | e' or 'enum | en'. Case insensitive).")
-  .argument('<object>', 'The object name to search for (Case insensitive).')
+  .aliases(['s', 'lookup'])
+  .description('Search for a specific function, enum or event in BotForge\'s documentation.')
+  .argument('<type>', 'The type of object to search for (or their shortcuts).')
+  .argument('<object>', 'The object name to search for (case insensitive).')
   .option('-e, --extension <extension>', 'Specify an extension to limit the search scope.')
   .option('-r, --raw', 'Output the result as raw JSON instead of formatted text.')
   .option('-d, --dev', 'Perform your research on the development branch.')
-  .option('-f, --fuzzy', 'Perform a fuzzy search for partial or approximate matches.') // Soon.
-  .option('--debug', 'Show debug information during the search process.') // Soon.
-  .option('--fetch', 'Fetch information using HTTP request and forces to cache the results.') // Soon.
+  .option('--debug', 'Show debug information during the search process.')
+  .option('--fetch', 'Fetch information using HTTP request and forces to cache the results.')
   .action(async (type: string, object: string, options: SearchOptions) => {
     const SearchType: string = type.toLowerCase();
     const Spinner: Ora = ora(`Searching for ${SearchType} '${object}'...`).start();
@@ -145,10 +112,12 @@ export const Search: Command = new Command('search')
       const NormalizedObject: string = NormalizeObjectName(object);
       const PreparedObjectName: string = PrepareObjectName(NormalizedObject, NormalizedType);
       
+      options.debug ? console.log(`\n${chalk.yellow('[DEBUG]')} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null
+
       Spinner.text = `Retrieving ${NormalizedType} '${object}'${options.extension ? ` from extension '${options.extension}'` : ''}...`;
       
       // Execute the search
-      const SearchResult: SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, options.dev ? true : false);
+      const SearchResult: SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, !!options.dev, !!options.debug);
       
       Spinner.stop();
 
@@ -169,21 +138,20 @@ export const Search: Command = new Command('search')
             case 'enum':
               console.log(chalk.yellowBright(`[Enum] ${SearchResult}`));
               break;
-          }
+          };
         }
       } else {
         console.log(`${chalk.red('[ERROR]')} No match found for '${object}' (${NormalizedType}).`);
         console.log(`Try checking the spelling or use 'forge list ${NormalizedType}s' to see all available ${NormalizedType}s.`);
-        process.exit(1)
-      }
-    } catch (err) {
+      };
+    } catch (error) {
       Spinner.stop();
-      console.error(`${chalk.red('[ERROR]')} ${(err as Error).message}`);
-      if ((err as Error).stack && process.env.DEBUG) {
-        console.error(chalk.gray((err as Error).stack));
+      console.error(`${chalk.red('[ERROR]')} ${(error as Error).message}`);
+      if ((error as Error).stack && process.env.DEBUG) {
+        console.error(chalk.gray((error as Error).stack));
       }
       process.exit(1);
-    }
+    };
   });
 
 /**
@@ -192,8 +160,8 @@ export const Search: Command = new Command('search')
 export const FileMetadata_search: IFileMetadata = {
   filename: 'search.ts',
   createdAt: new Date('2025-05-11T17:00:00+02:00'),
-  updatedAt: new Date('2025-05-15T18:28:00+02:00'),
-  author: 'Sébastien (@striatp)',
+  updatedAt: new Date('2025-05-15T18:16:00+02:00'),
+  author: 'striatp',
   description: 'CLI command to search for BotForge objects (functions, enums, events) in documentation.',
   tags: ['CLI', 'Search', 'Documentation', 'BotForge', 'Metadata']
 };
@@ -203,8 +171,8 @@ export const FileMetadata_search: IFileMetadata = {
  */
 export const CommandMetadata_Search: ICommandMetadata = {
   name: 'search',
-  aliases: ['s', 'lookup', 'lu'],
-  description: "Search for a specific function, enum or event in BotForge's documentation.",
+  aliases: ['s', 'lookup'],
+  description: 'Search for a specific function, enum or event in BotForge\'s documentation.',
   usage: 'forge search <type> <object> [options]',
   examples: [
     'forge search function sendMessage',
@@ -212,6 +180,18 @@ export const CommandMetadata_Search: ICommandMetadata = {
     'forge search event onReady',
     'forge search enum LogLevel --extension forgedb',
     'forge search function sendMessage --dev'
+  ],
+  arguments: [
+    {
+      flag: 'type, <type>',
+      description: 'The type of object to search for (or their shortcuts).',
+      required: true
+    },
+    {
+      flag: 'object, <object>',
+      description: 'The object name to search for (case insensitive).',
+      required: true
+    },
   ],
   options: [
     {
@@ -227,6 +207,16 @@ export const CommandMetadata_Search: ICommandMetadata = {
     {
       flag: '--dev, -d',
       description: 'Perform your research on the development branch.',
+      required: false
+    },
+    {
+      flag: '--debug',
+      description: 'Show debug information during the search process.',
+      required: false
+    },
+    {
+      flag: '--fetch',
+      description: 'Fetch information using HTTP request and forces to cache the results.',
       required: false
     }
   ],

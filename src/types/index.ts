@@ -7,3 +7,9 @@ export type * from './structure/functionMetadata';
 export type * from './interfaces/function';
 export type * from './interfaces/enum';
 export type * from './interfaces/events';
+
+// Exporting types
+export type * from './types/extensions';
+export type * from './types/searchType';
+export type * from './types/requestResult';
+export type * from './types/searchResult';

@@ -41,22 +41,32 @@ var name = "@tryforge/cli";
 var version = "0.0.1";
 
 // src/commands/search/search.ts
-var import_chalk = __toESM(require("chalk"));
+var import_chalk2 = __toESM(require("chalk"));
 var import_ora = __toESM(require("ora"));
 var import_commander = require("commander");
 
-// src/library/requesting/requestFunctions.ts
-async function RequestFunctions(extension, dev, forceFetch) {
+// src/library/requesting/requestMetadata.ts
+var import_chalk = __toESM(require("chalk"));
+async function RequestMetadata(type, extension, dev, debug, forceFetch) {
   const ExtensionName = extension?.toLowerCase() || "forgescript";
   const ExtensionRepos = {
     "forgedb": "ForgeDB",
     "forgecanvas": "ForgeCanvas",
     "forgetopgg": "ForgeTopGG",
-    "forgescript": "ForgeScript"
+    "forgescript": "ForgeScript",
+    "forgemusic": "ForgeMusic",
+    "forgelinked": "ForgeLinked"
   };
+  if (!(ExtensionName in ExtensionRepos)) {
+    console.log(`
+${import_chalk.default.red("[ERROR]")} The extension ${extension} does not exist or is not supported yet.`);
+    process.exit(1);
+  }
   const RepositoryName = ExtensionRepos[ExtensionName] || "ForgeScript";
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? "dev" : "main"}/metadata/functions.json`;
+  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? "dev" : "main"}/metadata/${type}s.json`;
   try {
+    debug ? console.log(`
+${import_chalk.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${"NormalizedType"}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null;
     const Response = await fetch(url);
     if (!Response.ok) {
       throw new Error(`HTTP error! Status: ${Response.status}`);
@@ -68,80 +78,38 @@ async function RequestFunctions(extension, dev, forceFetch) {
   }
 }
 
-// src/library/requesting/requestEnums.ts
-async function RequestEnums(extension, dev, forceFetch) {
-  const ExtensionName = extension?.toLowerCase() || "forgescript";
-  const ExtensionRepos = {
-    "forgedb": "ForgeDB",
-    "forgecanvas": "ForgeCanvas",
-    "forgetopgg": "ForgeTopGG",
-    "forgescript": "ForgeScript"
-  };
-  const RepositoryName = ExtensionRepos[ExtensionName] || "ForgeScript";
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? "dev" : "main"}/metadata/enums.json`;
-  try {
-    const Response = await fetch(url);
-    if (!Response.ok) {
-      throw new Error(`HTTP error! Status: ${Response.status}`);
-    }
-    return await Response.json();
-  } catch (error) {
-    console.error(`Error fetching functions for ${RepositoryName}:`, error);
-    throw error;
+// src/library/searching/searchMetadata.ts
+async function SearchMetadata(normalizedType, data, targetName, defaultValue) {
+  if (!data) {
+    throw new Error("Invalid data provided for search");
   }
-}
-
-// src/library/requesting/requestEvents.ts
-async function RequestEvents(extension, dev, forceFetch) {
-  const ExtensionName = extension?.toLowerCase() || "forgescript";
-  const ExtensionRepos = {
-    "forgedb": "ForgeDB",
-    "forgecanvas": "ForgeCanvas",
-    "forgetopgg": "ForgeTopGG",
-    "forgescript": "ForgeScript"
-  };
-  const RepositoryName = ExtensionRepos[ExtensionName] || "ForgeScript";
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? "dev" : "main"}/metadata/events.json`;
-  try {
-    const Response = await fetch(url);
-    if (!Response.ok) {
-      throw new Error(`HTTP error! Status: ${Response.status}`);
-    }
-    return await Response.json();
-  } catch (error) {
-    console.error(`Error fetching functions for ${RepositoryName}:`, error);
-    throw error;
-  }
-}
-
-// src/library/searching/searchFunction.ts
-async function SearchFunction(data, targetName, defaultValue) {
-  const LowerTarget = targetName.toLowerCase();
-  const Result = data.find(
-    (item) => item.name?.toLowerCase() === LowerTarget || item.aliases?.some((alias) => alias.toLowerCase() === LowerTarget)
-  );
-  return Result || defaultValue;
-}
-
-// src/library/searching/searchEnum.ts
-async function SearchEnum(data, targetName, defaultValue) {
-  if (targetName in data) {
-    return data[targetName];
-  }
-  const normalizedTargetName = targetName.replace(/^\$/, "");
-  for (const key of Object.keys(data)) {
-    if (key.toLowerCase() === normalizedTargetName.toLowerCase()) {
-      return data[key];
-    }
-  }
-  return defaultValue;
-}
-
-// src/library/searching/searchEvent.ts
-async function SearchEvent(data, targetName, defaultValue) {
   const lowerTarget = targetName.toLowerCase();
-  const result = data.find((item) => item.name.toLowerCase() === lowerTarget);
-  return result || defaultValue;
+  switch (normalizedType) {
+    case "function":
+      const functionResult = data.find(
+        (item) => item.name?.toLowerCase() === lowerTarget || item.aliases?.some((alias) => alias.toLowerCase() === lowerTarget)
+      );
+      return functionResult || defaultValue;
+    case "event":
+      const eventResult = data.find(
+        (item) => item.name.toLowerCase() === lowerTarget
+      );
+      return eventResult || defaultValue;
+    case "enum":
+      console.log(data);
+      if (targetName in data) {
+        return data[targetName];
+      }
+      const normalizedTargetName = targetName.replace(/^\$/, "");
+      for (const key of Object.keys(data)) {
+        if (key.toLowerCase() === normalizedTargetName.toLowerCase()) {
+          return data[key];
+        }
+      }
+      return defaultValue;
+    default:
+      throw new Error(`Unsupported search type: ${normalizedType}`);
+  }
 }
 
 // src/commands/search/search.ts
@@ -162,39 +130,38 @@ var ValidSearchTypes = {
 function IsValidType(type) {
   return Object.keys(ValidSearchTypes).includes(type.toLowerCase());
 }
-function NormalizeObjectName(objectName) {
-  return objectName.toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
+function NormalizeObjectName(normalizedType, objectName) {
+  if (normalizedType !== "event") {
+    return objectName.toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
+  } else {
+    return normalizedType;
+  }
+  ;
 }
 function PrepareObjectName(objectName, searchType) {
   return searchType === "function" ? `$${objectName}` : objectName;
 }
-async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev) {
-  switch (normalizedType) {
-    case "function":
-      const functions = await RequestFunctions(extension, !!dev);
-      return SearchFunction(functions, preparedObjectName, null);
-    case "enum":
-      const enums = await RequestEnums(extension, !!dev);
-      return SearchEnum(enums, preparedObjectName, null);
-    case "event":
-      const events = await RequestEvents(extension, !!dev);
-      return SearchEvent(events, preparedObjectName, null);
-  }
+async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev, debug, forceFetch) {
+  debug ? console.log(`${import_chalk2.default.yellow("[DEBUG]")} Starting the search.`) : null;
+  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!forceFetch, !!debug);
+  return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 }
-var Search = new import_commander.Command("search").aliases(["s", "lookup", "lu"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for ('function | f', 'event | e' or 'enum | en'. Case insensitive).").argument("<object>", "The object name to search for (Case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("-f, --fuzzy", "Perform a fuzzy search for partial or approximate matches.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
+var Search = new import_commander.Command("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
   const SearchType = type.toLowerCase();
   const Spinner = (0, import_ora.default)(`Searching for ${SearchType} '${object}'...`).start();
   try {
     if (!IsValidType(SearchType)) {
       Spinner.stop();
-      console.log(`${import_chalk.default.red("[ERROR]")} Please enter a valid object type: 'function', 'event' or 'enum' (or their shortcuts).`);
+      console.log(`${import_chalk2.default.red("[ERROR]")} Please enter a valid object type: 'function', 'event' or 'enum' (or their shortcuts).`);
       process.exit(1);
     }
     const NormalizedType = ValidSearchTypes[SearchType];
-    const NormalizedObject = NormalizeObjectName(object);
+    const NormalizedObject = NormalizeObjectName(NormalizedType, object);
     const PreparedObjectName = PrepareObjectName(NormalizedObject, NormalizedType);
+    options.debug ? console.log(`
+${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null;
     Spinner.text = `Retrieving ${NormalizedType} '${object}'${options.extension ? ` from extension '${options.extension}'` : ""}...`;
-    const SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, options.dev ? true : false);
+    const SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, !!options.dev, !!options.debug);
     Spinner.stop();
     if (SearchResult) {
       if (options.raw) {
@@ -202,37 +169,39 @@ var Search = new import_commander.Command("search").aliases(["s", "lookup", "lu"
       } else {
         switch (NormalizedType) {
           case "function":
-            console.log(import_chalk.default.cyanBright(`[Function] ${SearchResult}`));
+            console.log(import_chalk2.default.cyanBright(`[Function] ${SearchResult}`));
             break;
           case "event":
-            console.log(import_chalk.default.greenBright(`[Event] ${SearchResult}`));
+            console.log(import_chalk2.default.greenBright(`[Event] ${SearchResult}`));
             break;
           case "enum":
-            console.log(import_chalk.default.yellowBright(`[Enum] ${SearchResult}`));
+            console.log(import_chalk2.default.yellowBright(`[Enum] ${SearchResult}`));
             break;
         }
+        ;
       }
     } else {
-      console.log(`${import_chalk.default.red("[ERROR]")} No match found for '${object}' (${NormalizedType}).`);
+      console.log(`${import_chalk2.default.red("[ERROR]")} No match found for '${object}' (${NormalizedType}).`);
       console.log(`Try checking the spelling or use 'forge list ${NormalizedType}s' to see all available ${NormalizedType}s.`);
-      process.exit(1);
     }
-  } catch (err) {
+    ;
+  } catch (error) {
     Spinner.stop();
-    console.error(`${import_chalk.default.red("[ERROR]")} ${err.message}`);
-    if (err.stack && process.env.DEBUG) {
-      console.error(import_chalk.default.gray(err.stack));
+    console.error(`${import_chalk2.default.red("[ERROR]")} ${error.message}`);
+    if (error.stack && process.env.DEBUG) {
+      console.error(import_chalk2.default.gray(error.stack));
     }
     process.exit(1);
   }
+  ;
 });
 
 // src/commands/system/version.ts
-var import_chalk2 = __toESM(require("chalk"));
+var import_chalk3 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
 var import_ora2 = __toESM(require("ora"));
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
-  console.log(`Current version: ${import_chalk2.default.cyan(version)}
+  console.log(`Current version: ${import_chalk3.default.cyan(version)}
 `);
   const spinner = (0, import_ora2.default)("Checking for updates...").start();
   try {
@@ -242,16 +211,16 @@ var Version = new import_commander2.Command("version").description("Returns the 
     spinner.stop();
     if (latestVersion !== version) {
       console.log(
-        `${import_chalk2.default.yellow("A new version is available!")} ${import_chalk2.default.gray(version)} \u2192 ${import_chalk2.default.green(latestVersion)}`
+        `${import_chalk3.default.yellow("A new version is available!")} ${import_chalk3.default.gray(version)} \u2192 ${import_chalk3.default.green(latestVersion)}`
       );
-      console.log(`Run ${import_chalk2.default.cyan(`npm i -g ${name}`)} to update.
+      console.log(`Run ${import_chalk3.default.cyan(`npm i -g ${name}`)} to update.
 `);
     } else {
-      console.log(import_chalk2.default.green("You are using the latest version.\n"));
+      console.log(import_chalk3.default.green("You are using the latest version.\n"));
     }
   } catch (err) {
     spinner.stop();
-    console.error(`${import_chalk2.default.red("[ERROR]")} ${err.message}`);
+    console.error(`${import_chalk3.default.red("[ERROR]")} ${err.message}`);
   }
 });
 

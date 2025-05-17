@@ -31,7 +31,7 @@ export interface IFunction {
   /**
    * Function used to unwrap or process the function's results.
    */
-  Unwrap: boolean;
+  Unwrap?: boolean;
 
   /**
    * List of arguments the function accepts.

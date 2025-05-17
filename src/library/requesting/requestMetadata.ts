@@ -1,13 +1,15 @@
-import type { IFileMetadata, IFunctionMetadata } from "../../types";
+import chalk from 'chalk';
+
+import type { IFileMetadata, IFunctionMetadata, Extension, SearchType, IFunction, IEvent } from "../../types";
 
 /**
- * Fetches enum metadata from GitHub repositories based on the specified extension.
+ * Fetches metadata from GitHub repositories based on the specified extension.
  * 
- * This utility function retrieves the enums.json metadata file from the appropriate
+ * This utility function retrieves the enums.json | functions.json | events.json metadata file from the appropriate
  * GitHub repository based on the provided extension name. If no extension is specified,
  * it defaults to 'forgescript'.
  * 
- * @param {string} [extension] - The name of the extension to fetch enums for
+ * @param {string} [extension] - The name of the extension to fetch from.
  * 
  * @returns {Promise<any>} A promise that resolves to the parsed JSON response containing
  *   enum metadata from the repository
@@ -17,19 +19,31 @@ import type { IFileMetadata, IFunctionMetadata } from "../../types";
  * @async
  * @since 0.0.1
  */
-export async function RequestEnums(extension?: string, dev?: boolean, forceFetch?: boolean): Promise<Record<string, string[]>> {
+export async function RequestMetadata(
+  type: SearchType,
+  extension?: string,
+  dev?: boolean,
+  debug?: boolean,
+  forceFetch?: boolean
+): Promise<IFunction[] | IEvent[] | Record<string, string[]>> {
   const ExtensionName = extension?.toLowerCase() || 'forgescript';
-  const ExtensionRepos: Record<string, string> = {
+  const ExtensionRepos: Record<string, Extension> = {
     'forgedb': 'ForgeDB',
     'forgecanvas': 'ForgeCanvas',
     'forgetopgg': 'ForgeTopGG',
-    'forgescript': 'ForgeScript'
+    'forgescript': 'ForgeScript',
+    'forgemusic': 'ForgeMusic',
+    'forgelinked': 'ForgeLinked'
   };
-  
+  if (!(ExtensionName in ExtensionRepos)) {
+    console.log(`\n${chalk.red('[ERROR]')} The extension ${extension} does not exist or is not supported yet.`);
+    process.exit(1)
+  }
   const RepositoryName = ExtensionRepos[ExtensionName] || 'ForgeScript';
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? 'dev' : 'main'}/metadata/enums.json`;
+  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? 'dev' : 'main'}/metadata/${type}s.json`;
   
   try {
+    debug ? console.log(`\n${chalk.yellow('[DEBUG]')} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${'NormalizedType'}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null
     const Response = await fetch(url);
     
     if (!Response.ok) {
