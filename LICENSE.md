@@ -1,21 +1,7 @@
-Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
+Copyright 2025 Sébastien GARCIA
 
-Copyright 2025 Sébastien Garcia
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-You are free to:
-- Share — copy and redistribute the material in any medium or format for non-commercial purposes.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-Under the following terms:
-- Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-- Non-Commercial — You may not use the material for commercial purposes.
-- No Derivatives — If you remix, transform, or build upon the material, you may not distribute the modified material.
-
-No additional restrictions:
-- You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-Contributions:
-- Contributions to the project are allowed and welcome. All contributions will be subject to review, and may be accepted or rejected by the project owner. 
-- By submitting a contribution, you agree that your contribution may be used in accordance with the terms of this license.
-
-No warranty:
-- This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, or noninfringement.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
