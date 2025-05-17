@@ -32,7 +32,7 @@
     "ora"
   ],
   "author": "Sébastien GARCIA <sebastien.works@outlook.com> (https://github.com/Striatp)",
-  "license": "CC-BY-NC-ND-4.0",
+  "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
