@@ -1,7 +1,7 @@
 /**
  * Represents all supported extensions.
  */
-export type Extension = 
+export type TExtension = 
   'ForgeDB'
 | 'ForgeCanvas' 
 | 'ForgeTopGG' 

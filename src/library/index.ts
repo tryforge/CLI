@@ -1,16 +1,8 @@
-// Exporting search-related functions.
+// Exporting functions.
 export * from './requesting/requestMetadata';
-
 export * from './searching/searchMetadata';
+export * from './caching/getMetadataCachePath';
 
-
-/** METADATA */
-
-// Searching
+// Exporting meatdata.
 export { FileMetadata_searchMetadata, FunctionMetadata_SearchMetadata } from './searching/searchMetadata';
-
-// Requesting
-export { FileMetadata_requestEnums, FunctionMetadata_RequestEnums } from './requesting/requestMetadata';
-
-// System
-export { FileMetadata_latestVersion, FunctionMetadata_LatestVersion } from './system/latestVersion';
+export { FileMetadata_requestMetadata, FunctionMetadata_RequestMetadata } from './requesting/requestMetadata';

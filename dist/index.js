@@ -46,34 +46,99 @@ var import_ora = __toESM(require("ora"));
 var import_commander = require("commander");
 
 // src/library/requesting/requestMetadata.ts
+var import_promises = __toESM(require("fs/promises"));
 var import_chalk = __toESM(require("chalk"));
-async function RequestMetadata(type, extension, dev, debug, forceFetch) {
-  const ExtensionName = extension?.toLowerCase() || "forgescript";
+var import_path = __toESM(require("path"));
+var OneHour = 60 * 60 * 1e3;
+async function RequestMetadata(type, extension = "forgescript", dev = false, debug = false, forceFetch = false) {
+  const ExtensionName = extension.toLowerCase();
   const ExtensionRepos = {
-    "forgedb": "ForgeDB",
-    "forgecanvas": "ForgeCanvas",
-    "forgetopgg": "ForgeTopGG",
-    "forgescript": "ForgeScript",
-    "forgemusic": "ForgeMusic",
-    "forgelinked": "ForgeLinked"
+    forgedb: "ForgeDB",
+    forgecanvas: "ForgeCanvas",
+    forgetopgg: "ForgeTopGG",
+    forgescript: "ForgeScript",
+    forgemusic: "ForgeMusic",
+    forgelinked: "ForgeLinked"
   };
   if (!(ExtensionName in ExtensionRepos)) {
-    console.log(`
-${import_chalk.default.red("[ERROR]")} The extension ${extension} does not exist or is not supported yet.`);
+    console.error(`
+${import_chalk.default.red("[ERROR]")} The extension '${extension}' is not supported.`);
     process.exit(1);
   }
-  const RepositoryName = ExtensionRepos[ExtensionName] || "ForgeScript";
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${dev ? "dev" : "main"}/metadata/${type}s.json`;
-  try {
-    debug ? console.log(`
-${import_chalk.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${"NormalizedType"}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null;
-    const Response = await fetch(url);
-    if (!Response.ok) {
-      throw new Error(`HTTP error! Status: ${Response.status}`);
+  const RepositoryName = ExtensionRepos[ExtensionName];
+  const Branch = dev ? "dev" : "main";
+  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${Branch}/metadata/${type}s.json`;
+  const CachePath = getMetadataCachePath(ExtensionName, type);
+  if (!forceFetch) {
+    try {
+      const Cached = await import_promises.default.readFile(CachePath, "utf-8");
+      const Parsed = JSON.parse(Cached);
+      const CachedDate = new Date(Parsed.cachedAt);
+      const Now = /* @__PURE__ */ new Date();
+      const isExpired = Now.getTime() - CachedDate.getTime() > OneHour;
+      if (debug) {
+        console.log(`${import_chalk.default.gray("[CACHE]")} Loaded from cache: ${CachePath}`);
+        console.log(`${import_chalk.default.gray("[CACHE]")} Cached at: ${Parsed.cachedAt}`);
+        if (isExpired) {
+          console.log(`${import_chalk.default.yellow("[CACHE]")} Cache is older than 1 hour, refetching...`);
+        }
+      }
+      if (!isExpired) {
+        return Parsed.data;
+      }
+    } catch {
+      try {
+        if (debug) {
+          console.log(`
+${import_chalk.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
+        }
+        const Response = await fetch(url);
+        if (!Response.ok) {
+          throw new Error(`HTTP error! Status: ${Response.status}`);
+        }
+        const json = await Response.json();
+        const CacheDir = import_path.default.dirname(CachePath);
+        await import_promises.default.mkdir(CacheDir, { recursive: true });
+        const Wrapped = {
+          cachedAt: (/* @__PURE__ */ new Date()).toISOString(),
+          data: json
+        };
+        await import_promises.default.writeFile(CachePath, JSON.stringify(Wrapped, null, 2), "utf-8");
+        if (debug) {
+          console.log(`${import_chalk.default.green("[SUCCESS]")} Cached to ${CachePath}`);
+        }
+        return json;
+      } catch (error) {
+        console.error(`
+${import_chalk.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
+        throw error;
+      }
     }
-    return await Response.json();
+  }
+  try {
+    if (debug) {
+      console.log(`
+${import_chalk.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
+    }
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const json = await response.json();
+    const cacheDir = import_path.default.dirname(CachePath);
+    await import_promises.default.mkdir(cacheDir, { recursive: true });
+    const wrapped = {
+      cachedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      data: json
+    };
+    await import_promises.default.writeFile(CachePath, JSON.stringify(wrapped, null, 2), "utf-8");
+    if (debug) {
+      console.log(`${import_chalk.default.green("[SUCCESS]")} Cached to ${CachePath}`);
+    }
+    return json;
   } catch (error) {
-    console.error(`Error fetching functions for ${RepositoryName}:`, error);
+    console.error(`
+${import_chalk.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
     throw error;
   }
 }
@@ -83,33 +148,52 @@ async function SearchMetadata(normalizedType, data, targetName, defaultValue) {
   if (!data) {
     throw new Error("Invalid data provided for search");
   }
-  const lowerTarget = targetName.toLowerCase();
+  const LowerTarget = targetName.toLowerCase();
   switch (normalizedType) {
     case "function":
-      const functionResult = data.find(
-        (item) => item.name?.toLowerCase() === lowerTarget || item.aliases?.some((alias) => alias.toLowerCase() === lowerTarget)
-      );
-      return functionResult || defaultValue;
+      {
+        const functionResult = data.find(
+          (item) => item.name?.toLowerCase() === LowerTarget || item.aliases?.some((alias) => alias.toLowerCase() === LowerTarget)
+        );
+        return functionResult || defaultValue;
+      }
+      ;
     case "event":
-      const eventResult = data.find(
-        (item) => item.name.toLowerCase() === lowerTarget
-      );
-      return eventResult || defaultValue;
+      {
+        const EventResult = data.find(
+          (item) => item.name.toLowerCase() === LowerTarget
+        );
+        return EventResult || defaultValue;
+      }
+      ;
     case "enum":
-      console.log(data);
-      if (targetName in data) {
-        return data[targetName];
-      }
-      const normalizedTargetName = targetName.replace(/^\$/, "");
-      for (const key of Object.keys(data)) {
-        if (key.toLowerCase() === normalizedTargetName.toLowerCase()) {
-          return data[key];
+      {
+        if (targetName in data) {
+          return data[targetName];
         }
+        return defaultValue;
       }
-      return defaultValue;
+      ;
     default:
-      throw new Error(`Unsupported search type: ${normalizedType}`);
+      {
+        throw new Error(`Unsupported search type: ${normalizedType}`);
+      }
+      ;
   }
+}
+
+// src/library/caching/getMetadataCachePath.ts
+var import_path2 = __toESM(require("path"));
+var import_os = __toESM(require("os"));
+function getMetadataCachePath(extension, type) {
+  return import_path2.default.join(
+    import_os.default.homedir(),
+    ".forgerc",
+    "cache",
+    "metadata",
+    extension.toLowerCase(),
+    `${type}s.json`
+  );
 }
 
 // src/commands/search/search.ts
@@ -130,20 +214,18 @@ var ValidSearchTypes = {
 function IsValidType(type) {
   return Object.keys(ValidSearchTypes).includes(type.toLowerCase());
 }
-function NormalizeObjectName(normalizedType, objectName) {
-  if (normalizedType !== "event") {
-    return objectName.toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
-  } else {
-    return normalizedType;
-  }
-  ;
+function NormalizeObjectName(objectName) {
+  return objectName.toLowerCase().replace(/[^a-zA-Z0-9_]/g, "");
 }
 function PrepareObjectName(objectName, searchType) {
   return searchType === "function" ? `$${objectName}` : objectName;
 }
 async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev, debug, forceFetch) {
-  debug ? console.log(`${import_chalk2.default.yellow("[DEBUG]")} Starting the search.`) : null;
-  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!forceFetch, !!debug);
+  if (debug) {
+    console.log(`${import_chalk2.default.yellow("[DEBUG]")} Starting the search.`);
+  }
+  ;
+  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
   return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 }
 var Search = new import_commander.Command("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
@@ -156,10 +238,13 @@ var Search = new import_commander.Command("search").aliases(["s", "lookup"]).des
       process.exit(1);
     }
     const NormalizedType = ValidSearchTypes[SearchType];
-    const NormalizedObject = NormalizeObjectName(NormalizedType, object);
+    const NormalizedObject = NormalizeObjectName(object);
     const PreparedObjectName = PrepareObjectName(NormalizedObject, NormalizedType);
-    options.debug ? console.log(`
-${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null;
+    if (options.debug) {
+      console.log(`
+${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`);
+    }
+    ;
     Spinner.text = `Retrieving ${NormalizedType} '${object}'${options.extension ? ` from extension '${options.extension}'` : ""}...`;
     const SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, !!options.dev, !!options.debug);
     Spinner.stop();

@@ -1,4 +1,4 @@
-import type { IFileMetadata, IFunctionMetadata, SearchType, RequestResult, SearchResult } from "../../types";
+import type { IFileMetadata, IFunctionMetadata, TSearchType, TRequestResult, TSearchResult } from "../../types";
 
 /**
  * Searches for metadata based on type and returns a match or default value.
@@ -21,42 +21,45 @@ import type { IFileMetadata, IFunctionMetadata, SearchType, RequestResult, Searc
  * @since 0.0.1
  */
 export async function SearchMetadata<T>(
-  normalizedType: SearchType,
-  data: RequestResult, 
+  normalizedType: TSearchType,
+  data: TRequestResult, 
   targetName: string, 
   defaultValue: T
-): Promise<SearchResult | T> {
-  // Check if data exists
+): Promise<TSearchResult | T> {
   if (!data) {
     throw new Error("Invalid data provided for search");
   }
 
-  const lowerTarget = targetName.toLowerCase();
+  const LowerTarget = targetName.toLowerCase();
 
   switch (normalizedType) {
-    case 'function':
+    case 'function': {
       const functionResult = data.find(item =>
-        item.name?.toLowerCase() === lowerTarget ||
-        item.aliases?.some(alias => alias.toLowerCase() === lowerTarget)
+        item.name?.toLowerCase() === LowerTarget ||
+        item.aliases?.some(alias => alias.toLowerCase() === LowerTarget)
       );
 
       return functionResult || defaultValue;
-      
-    case 'event':
-      const eventResult = data.find(item => 
-        item.name.toLowerCase() === lowerTarget
+    };
+
+    case 'event': {
+      const EventResult = data.find(item => 
+        item.name.toLowerCase() === LowerTarget
       );
 
-      return eventResult || defaultValue;
-      
-    case 'enum':
+      return EventResult || defaultValue;
+    };
+
+    case 'enum': {
       if (targetName in data) {
         return data[targetName];
       }
       return defaultValue;
-      
-    default:
+    
+    };
+    default: {
       throw new Error(`Unsupported search type: ${normalizedType}`);
+    };
   }
 }
 

@@ -3,12 +3,12 @@ import ora, { Ora } from 'ora';
 import { Command } from 'commander';
 
 import { RequestMetadata, SearchMetadata } from '../../library';
-import type { ICommandMetadata, IEvent, IFileMetadata, IFunction, SearchResult, SearchType } from '../../types';
+import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../types';
 
 /**
  * Valid search type options for BotForge object types.
  */
-const ValidSearchTypes: Record<string, SearchType> = {
+const ValidSearchTypes: Record<string, TSearchType> = {
   'function': 'function', 'f': 'function', 'fn': 'function', 'func': 'function',
   'event': 'event', 'e': 'event', 'ev': 'event', 'evt': 'event',
   'enum': 'enum', 'en': 'enum', 'n': 'enum', 'enm': 'enum'
@@ -44,7 +44,7 @@ function NormalizeObjectName(objectName: string): string {
  */
 function PrepareObjectName(
   objectName: string,
-  searchType: SearchType
+  searchType: TSearchType
 ): string {
   return (searchType === 'function') ? `$${objectName}` : objectName;
 };
@@ -53,15 +53,17 @@ function PrepareObjectName(
  * Executes the search for a BotForge object based on type and name.
  */
 async function ExecuteSearch(
-  normalizedType: SearchType,
+  normalizedType: TSearchType,
   preparedObjectName: string,
   extension?: string,
   dev?: boolean,
   debug?: boolean,
   forceFetch?: boolean
-): Promise<SearchResult> {
-  debug ? console.log(`${chalk.yellow('[DEBUG]')} Starting the search.`) : null
-  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!forceFetch, !!debug);
+): Promise<TSearchResult> {
+  if (debug) {
+    console.log(`${chalk.yellow('[DEBUG]')} Starting the search.`)
+  };
+  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
   
   return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 };
@@ -108,17 +110,19 @@ export const Search: Command = new Command('search')
       }
 
       // Normalize inputs
-      const NormalizedType: SearchType = ValidSearchTypes[SearchType];
+      const NormalizedType: TSearchType = ValidSearchTypes[SearchType];
       const NormalizedObject: string = NormalizeObjectName(object);
       const PreparedObjectName: string = PrepareObjectName(NormalizedObject, NormalizedType);
-      
-      options.debug ? console.log(`\n${chalk.yellow('[DEBUG]')} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`) : null
+
+      if (options.debug) {
+        console.log(`\n${chalk.yellow('[DEBUG]')} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`);
+      };
 
       Spinner.text = `Retrieving ${NormalizedType} '${object}'${options.extension ? ` from extension '${options.extension}'` : ''}...`;
-      
+
       // Execute the search
-      const SearchResult: SearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, !!options.dev, !!options.debug);
-      
+      const SearchResult: TSearchResult = await ExecuteSearch(NormalizedType, PreparedObjectName, options.extension, !!options.dev, !!options.debug);
+
       Spinner.stop();
 
       // Display results

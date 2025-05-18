@@ -1,7 +1,7 @@
 // Exporting structure-related types
-export type * from './structure/commandMetadata';
-export type * from './structure/fileMetadata';
-export type * from './structure/functionMetadata';
+export type * from './structure/metadata/commandMetadata';
+export type * from './structure/metadata/fileMetadata';
+export type * from './structure/metadata/functionMetadata';
 
 // Exporting interfaces
 export type * from './interfaces/function';
@@ -10,6 +10,6 @@ export type * from './interfaces/events';
 
 // Exporting types
 export type * from './types/extensions';
-export type * from './types/searchType';
-export type * from './types/requestResult';
-export type * from './types/searchResult';
+export type * from './types/search/searchType';
+export type * from './types/search/searchResult';
+export type * from './types/request/requestResult';
