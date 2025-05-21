@@ -41,14 +41,437 @@ var name = "@tryforge/cli";
 var version = "0.0.1";
 
 // src/commands/search/search.ts
-var import_chalk2 = __toESM(require("chalk"));
+var import_chalk3 = __toESM(require("chalk"));
 var import_ora = __toESM(require("ora"));
 var import_commander = require("commander");
 
 // src/library/requesting/requestMetadata.ts
+var import_chalk2 = __toESM(require("chalk"));
+
+// src/managers/CacheManager.ts
 var import_promises = __toESM(require("fs/promises"));
-var import_chalk = __toESM(require("chalk"));
+var import_os = __toESM(require("os"));
 var import_path = __toESM(require("path"));
+
+// src/managers/logger.ts
+var import_chalk = __toESM(require("chalk"));
+var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
+  LogLevel2[LogLevel2["TRACE"] = 0] = "TRACE";
+  LogLevel2[LogLevel2["DEBUG"] = 1] = "DEBUG";
+  LogLevel2[LogLevel2["INFO"] = 2] = "INFO";
+  LogLevel2[LogLevel2["SUCCESS"] = 3] = "SUCCESS";
+  LogLevel2[LogLevel2["WARN"] = 4] = "WARN";
+  LogLevel2[LogLevel2["ERROR"] = 5] = "ERROR";
+  LogLevel2[LogLevel2["FATAL"] = 6] = "FATAL";
+  LogLevel2[LogLevel2["SILENT"] = 7] = "SILENT";
+  return LogLevel2;
+})(LogLevel || {});
+var LoggerManager = class _LoggerManager {
+  /**
+   * Creates a new Logger instance
+   * 
+   * @param config Logger configuration options
+   */
+  constructor(config = {}) {
+    this.Level = config.level ?? 2 /* INFO */;
+    this.Format = {
+      timestamp: config.format?.timestamp ?? true,
+      level: config.format?.level ?? true,
+      scope: config.format?.scope ?? true,
+      color: config.format?.color ?? true
+    };
+    this.WriteToConsole = config.console ?? true;
+    this.FilePath = config.file;
+    this.DefaultScope = config.scope;
+  }
+  /**
+   * Creates a child logger with a specific scope
+   * 
+   * @param scope The scope name for the child logger
+   * @returns A new Logger instance with the specified scope
+   */
+  scope(scope) {
+    const ChildLogger = new _LoggerManager({
+      level: this.Level,
+      format: this.Format,
+      console: this.WriteToConsole,
+      file: this.FilePath,
+      scope
+    });
+    return ChildLogger;
+  }
+  /**
+   * Sets the minimum log level
+   * 
+   * @param level The minimum level to log
+   * @returns The logger instance for chaining
+   */
+  setLevel(level) {
+    this.Level = level;
+    return this;
+  }
+  /**
+   * Formats a log message with the appropriate prefixes and colors
+   * 
+   * @param level The log level
+   * @param message The message to log
+   * @param scope Optional scope override
+   * @returns Formatted log message
+   */
+  formatMessage(level, message, scope) {
+    const parts = [];
+    if (this.Format.timestamp) {
+      const now = /* @__PURE__ */ new Date();
+      const timestamp = now.toISOString().replace("T", " ").substring(0, 19);
+      parts.push(this.Format.color ? import_chalk.default.gray(`[${timestamp}]`) : `[${timestamp}]`);
+    }
+    if (this.Format.level) {
+      const levelName = LogLevel[level].toUpperCase();
+      let levelStr = `[${levelName}]`;
+      if (this.Format.color) {
+        switch (level) {
+          case 0 /* TRACE */:
+            levelStr = import_chalk.default.gray(levelStr);
+            break;
+          case 1 /* DEBUG */:
+            levelStr = import_chalk.default.blue(levelStr);
+            break;
+          case 2 /* INFO */:
+            levelStr = import_chalk.default.cyan(levelStr);
+            break;
+          case 3 /* SUCCESS */:
+            levelStr = import_chalk.default.green(levelStr);
+            break;
+          case 4 /* WARN */:
+            levelStr = import_chalk.default.yellow(levelStr);
+            break;
+          case 5 /* ERROR */:
+            levelStr = import_chalk.default.red(levelStr);
+            break;
+          case 6 /* FATAL */:
+            levelStr = import_chalk.default.bgRed.white(levelStr);
+            break;
+        }
+      }
+      parts.push(levelStr);
+    }
+    const finalScope = scope || this.DefaultScope;
+    if (this.Format.scope && finalScope) {
+      const scopeStr = `[${finalScope}]`;
+      parts.push(this.Format.color ? import_chalk.default.magenta(scopeStr) : scopeStr);
+    }
+    parts.push(message);
+    return parts.join(" ");
+  }
+  /**
+   * Internal logging method
+   * 
+   * @param level Log level
+   * @param message Message or object to log
+   * @param scope Optional scope override
+   */
+  log(level, message, scope) {
+    if (level < this.Level) return;
+    const messageStr = typeof message === "string" ? message : JSON.stringify(message, null, 2);
+    const formattedMessage = this.formatMessage(level, messageStr, scope);
+    if (this.WriteToConsole) {
+      switch (level) {
+        case 5 /* ERROR */:
+        case 6 /* FATAL */:
+          console.error(formattedMessage);
+          break;
+        case 4 /* WARN */:
+          console.warn(formattedMessage);
+          break;
+        default:
+          console.log(formattedMessage);
+      }
+    }
+    if (this.FilePath) {
+    }
+  }
+  /**
+   * Logs a trace message (most verbose)
+   */
+  trace(message, scope) {
+    this.log(0 /* TRACE */, message, scope);
+  }
+  /**
+   * Logs a debug message
+   */
+  debug(message, scope) {
+    this.log(1 /* DEBUG */, message, scope);
+  }
+  /**
+   * Logs an info message
+   */
+  info(message, scope) {
+    this.log(2 /* INFO */, message, scope);
+  }
+  /**
+   * Logs a success message
+   */
+  success(message, scope) {
+    this.log(3 /* SUCCESS */, message, scope);
+  }
+  /**
+   * Logs a warning message
+   */
+  warn(message, scope) {
+    this.log(4 /* WARN */, message, scope);
+  }
+  /**
+   * Logs an error message
+   */
+  error(message, scope) {
+    this.log(5 /* ERROR */, message, scope);
+  }
+  /**
+   * Logs a fatal error message (most severe)
+   */
+  fatal(message, scope) {
+    this.log(6 /* FATAL */, message, scope);
+  }
+  /**
+   * Creates a global logger instance with default configuration
+   * 
+   * @returns A configured Logger instance
+   */
+  static createDefault() {
+    return new _LoggerManager({
+      level: 2 /* INFO */,
+      format: {
+        timestamp: false,
+        level: true,
+        scope: true,
+        color: true
+      }
+    });
+  }
+};
+var Logger = LoggerManager.createDefault();
+
+// src/managers/CacheManager.ts
+var CacheScheme = class {
+};
+var CacheManager = class extends CacheScheme {
+  constructor(WorkspaceRoot) {
+    super();
+    this.WorkspaceRoot = WorkspaceRoot;
+    this.LocalCachePath = import_path.default.join(import_os.default.homedir() || "", ".forge");
+    this.WorkspaceCachePath = import_path.default.join(this.WorkspaceRoot, ".forge");
+  }
+  /**
+   * Ensures the directory exists, returns true if it exists/was created successfully.
+   */
+  async localCacheExists() {
+    try {
+      await import_promises.default.mkdir(
+        this.LocalCachePath,
+        { recursive: true }
+      );
+      return true;
+    } catch {
+      Logger.error(`Failed to ensure local cache directory: ${this.LocalCachePath}.`);
+      return false;
+    }
+  }
+  /**
+   * Ensures a workspace cache directory exists.
+   */
+  async workspaceCacheExists() {
+    try {
+      await import_promises.default.mkdir(
+        this.WorkspaceCachePath,
+        { recursive: true }
+      );
+      return true;
+    } catch {
+      Logger.error(`Failed to ensure workspace cache directory: ${this.WorkspaceCachePath}.`);
+      return false;
+    }
+  }
+  /**
+   * Gets the full path for a cache entry.
+   */
+  getCachePath(scope, cachePath) {
+    const basePath = scope === "user" ? this.LocalCachePath : this.WorkspaceCachePath;
+    if (!cachePath) {
+      return basePath;
+    }
+    return import_path.default.join(basePath, cachePath);
+  }
+  /**
+   * Writes data to cache.
+   */
+  async writeCache(scope, cachePath, data) {
+    try {
+      if (scope === "user") {
+        await this.localCacheExists();
+      } else {
+        await this.workspaceCacheExists();
+      }
+      const fullPath = this.getCachePath(
+        scope,
+        cachePath.endsWith(".json") ? cachePath : `${cachePath}.json`
+      );
+      const parentDirectory = import_path.default.dirname(fullPath);
+      await import_promises.default.mkdir(
+        parentDirectory,
+        { recursive: true }
+      );
+      const cacheContent = {
+        updatedAt: /* @__PURE__ */ new Date(),
+        data
+      };
+      if (await this.hasCache(scope, cachePath)) {
+        const existingCache = await this.readCache(scope, cachePath);
+        if (existingCache && existingCache.updatedAt) {
+          cacheContent.updatedAt = new Date(existingCache.updatedAt);
+        }
+      }
+      await import_promises.default.writeFile(
+        fullPath,
+        JSON.stringify(cacheContent, null, 2),
+        "utf-8"
+      );
+      return true;
+    } catch {
+      Logger.error(`Failed to write to cache: ${cachePath}.`);
+      return false;
+    }
+  }
+  /**
+   * Reads data from cache.
+   */
+  async readCache(scope, cachePath) {
+    try {
+      const fullPath = this.getCachePath(scope, cachePath);
+      const fileContent = await import_promises.default.readFile(fullPath, "utf-8");
+      const cacheContent = JSON.parse(fileContent);
+      return cacheContent.data;
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * Checks if cache exists at the given path.
+   */
+  async hasCache(scope, cachePath) {
+    try {
+      const fullPath = this.getCachePath(scope, cachePath);
+      await import_promises.default.access(fullPath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Lists all cache entries in the specified scope.
+   */
+  async listCache(scope) {
+    try {
+      const basePath = this.getCachePath(scope);
+      const listJsonFiles = async (dirPath, baseDir) => {
+        const entries = await import_promises.default.readdir(
+          dirPath,
+          { withFileTypes: true }
+        );
+        const files = [];
+        for (const entry of entries) {
+          const fullPath = import_path.default.join(dirPath, entry.name);
+          const relativePath = import_path.default.relative(baseDir, fullPath);
+          if (entry.isDirectory()) {
+            const nestedFiles = await listJsonFiles(fullPath, baseDir);
+            files.push(...nestedFiles);
+          } else if (entry.isFile() && entry.name.endsWith(".json")) {
+            files.push(relativePath);
+          }
+        }
+        return files;
+      };
+      if (scope === "user") {
+        await this.localCacheExists();
+      } else {
+        await this.workspaceCacheExists();
+      }
+      return await listJsonFiles(basePath, basePath);
+    } catch {
+      Logger.error(`Failed to list cache for scope: ${scope}.`);
+      return [];
+    }
+  }
+  /**
+   * Gets metadata for a cache entry.
+   */
+  async getCacheMetadata(scope, cachePath) {
+    try {
+      if (!cachePath) {
+        return null;
+      }
+      const fullPath = this.getCachePath(scope, cachePath);
+      const fileContent = await import_promises.default.readFile(fullPath, "utf-8");
+      const cacheContent = JSON.parse(fileContent);
+      return {
+        updatedAt: new Date(cacheContent.updatedAt)
+      };
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * Clears cache entries.
+   */
+  async clearCache(scope, cachePath) {
+    try {
+      if (cachePath) {
+        const fullPath = this.getCachePath(scope, cachePath);
+        let data = null;
+        try {
+          data = await this.readCache(scope, cachePath);
+        } catch {
+        }
+        await import_promises.default.unlink(fullPath);
+        return {
+          success: true,
+          data
+        };
+      } else {
+        const basePath = scope === "user" ? this.LocalCachePath : this.WorkspaceCachePath;
+        try {
+          await import_promises.default.access(basePath);
+          await import_promises.default.rm(
+            basePath,
+            { recursive: true, force: true }
+          );
+          if (scope === "user") {
+            await this.localCacheExists();
+          } else {
+            await this.workspaceCacheExists();
+          }
+        } catch {
+          if (scope === "user") {
+            await this.localCacheExists();
+          } else {
+            await this.workspaceCacheExists();
+          }
+        }
+        return {
+          success: true,
+          data: {}
+        };
+      }
+    } catch (error) {
+      Logger.error(`Failed to clear cache: ${scope}/${cachePath || "all"}.`);
+      return {
+        success: false,
+        data: {}
+      };
+    }
+  }
+};
+
+// src/library/requesting/requestMetadata.ts
 var OneHour = 60 * 60 * 1e3;
 async function RequestMetadata(type, extension = "forgescript", dev = false, debug = false, forceFetch = false) {
   const ExtensionName = extension.toLowerCase();
@@ -62,83 +485,74 @@ async function RequestMetadata(type, extension = "forgescript", dev = false, deb
   };
   if (!(ExtensionName in ExtensionRepos)) {
     console.error(`
-${import_chalk.default.red("[ERROR]")} The extension '${extension}' is not supported.`);
+${import_chalk2.default.red("[ERROR]")} The extension '${extension}' is not supported.`);
     process.exit(1);
   }
   const RepositoryName = ExtensionRepos[ExtensionName];
   const Branch = dev ? "dev" : "main";
   const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${Branch}/metadata/${type}s.json`;
-  const CachePath = getMetadataCachePath(ExtensionName, type);
+  const cacheManager = new CacheManager(process.cwd());
+  const cachePath = `metadata/${ExtensionName}/${type}s.json`;
   if (!forceFetch) {
     try {
-      const Cached = await import_promises.default.readFile(CachePath, "utf-8");
-      const Parsed = JSON.parse(Cached);
-      const CachedDate = new Date(Parsed.cachedAt);
-      const Now = /* @__PURE__ */ new Date();
-      const isExpired = Now.getTime() - CachedDate.getTime() > OneHour;
+      const hasCachedData = await cacheManager.hasCache("user", cachePath);
+      if (hasCachedData) {
+        const cacheMetadata = await cacheManager.getCacheMetadata("user", cachePath);
+        const cachedContent = await cacheManager.readCache("user", cachePath);
+        if (cachedContent && cachedContent.data) {
+          const cachedDate = new Date(cachedContent.cachedAt || (cacheMetadata?.updatedAt || /* @__PURE__ */ new Date()).toISOString());
+          const now = /* @__PURE__ */ new Date();
+          const isExpired = now.getTime() - cachedDate.getTime() > OneHour;
+          if (debug) {
+            console.log(`${import_chalk2.default.gray("[CACHE]")} Loaded from cache: ${cachePath}`);
+            console.log(`${import_chalk2.default.gray("[CACHE]")} Cached at: ${cachedContent.cachedAt || (cacheMetadata?.updatedAt || "unknown").toString()}`);
+            if (isExpired) {
+              console.log(`${import_chalk2.default.yellow("[CACHE]")} Cache is older than 1 hour, refetching...`);
+            }
+          }
+          if (!isExpired) {
+            return cachedContent.data;
+          }
+        }
+      }
+    } catch (error) {
       if (debug) {
-        console.log(`${import_chalk.default.gray("[CACHE]")} Loaded from cache: ${CachePath}`);
-        console.log(`${import_chalk.default.gray("[CACHE]")} Cached at: ${Parsed.cachedAt}`);
-        if (isExpired) {
-          console.log(`${import_chalk.default.yellow("[CACHE]")} Cache is older than 1 hour, refetching...`);
+        if (error instanceof Error) {
+          console.log(`${import_chalk2.default.yellow("[CACHE]")} Failed to read cache: ${error.message}`);
+        } else {
+          console.log(`${import_chalk2.default.yellow("[CACHE]")} Failed to read cache: ${String(error)}`);
         }
-      }
-      if (!isExpired) {
-        return Parsed.data;
-      }
-    } catch {
-      try {
-        if (debug) {
-          console.log(`
-${import_chalk.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
-        }
-        const Response = await fetch(url);
-        if (!Response.ok) {
-          throw new Error(`HTTP error! Status: ${Response.status}`);
-        }
-        const json = await Response.json();
-        const CacheDir = import_path.default.dirname(CachePath);
-        await import_promises.default.mkdir(CacheDir, { recursive: true });
-        const Wrapped = {
-          cachedAt: (/* @__PURE__ */ new Date()).toISOString(),
-          data: json
-        };
-        await import_promises.default.writeFile(CachePath, JSON.stringify(Wrapped, null, 2), "utf-8");
-        if (debug) {
-          console.log(`${import_chalk.default.green("[SUCCESS]")} Cached to ${CachePath}`);
-        }
-        return json;
-      } catch (error) {
-        console.error(`
-${import_chalk.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
-        throw error;
       }
     }
   }
   try {
     if (debug) {
       console.log(`
-${import_chalk.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
+${import_chalk2.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
     }
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const json = await response.json();
-    const cacheDir = import_path.default.dirname(CachePath);
-    await import_promises.default.mkdir(cacheDir, { recursive: true });
-    const wrapped = {
-      cachedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+    const cacheData = {
+      cachedAt: timestamp,
       data: json
     };
-    await import_promises.default.writeFile(CachePath, JSON.stringify(wrapped, null, 2), "utf-8");
+    const cacheResult = await cacheManager.writeCache("user", cachePath, cacheData);
     if (debug) {
-      console.log(`${import_chalk.default.green("[SUCCESS]")} Cached to ${CachePath}`);
+      if (cacheResult) {
+        console.log(`${import_chalk2.default.green("[SUCCESS]")} Cached to ${cachePath}`);
+        console.log(`${import_chalk2.default.gray("[CACHE]")} Cache timestamp: ${timestamp}`);
+      } else {
+        console.log(`${import_chalk2.default.yellow("[WARNING]")} Failed to cache metadata`);
+      }
     }
     return json;
   } catch (error) {
     console.error(`
-${import_chalk.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
+${import_chalk2.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
     throw error;
   }
 }
@@ -182,20 +596,6 @@ async function SearchMetadata(normalizedType, data, targetName, defaultValue) {
   }
 }
 
-// src/library/caching/getMetadataCachePath.ts
-var import_path2 = __toESM(require("path"));
-var import_os = __toESM(require("os"));
-function getMetadataCachePath(extension, type) {
-  return import_path2.default.join(
-    import_os.default.homedir(),
-    ".forgerc",
-    "cache",
-    "metadata",
-    extension.toLowerCase(),
-    `${type}s.json`
-  );
-}
-
 // src/commands/search/search.ts
 var ValidSearchTypes = {
   "function": "function",
@@ -222,7 +622,7 @@ function PrepareObjectName(objectName, searchType) {
 }
 async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev, debug, forceFetch) {
   if (debug) {
-    console.log(`${import_chalk2.default.yellow("[DEBUG]")} Starting the search.`);
+    console.log(`${import_chalk3.default.yellow("[DEBUG]")} Starting the search.`);
   }
   ;
   const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
@@ -234,7 +634,7 @@ var Search = new import_commander.Command("search").aliases(["s", "lookup"]).des
   try {
     if (!IsValidType(SearchType)) {
       Spinner.stop();
-      console.log(`${import_chalk2.default.red("[ERROR]")} Please enter a valid object type: 'function', 'event' or 'enum' (or their shortcuts).`);
+      console.log(`${import_chalk3.default.red("[ERROR]")} Please enter a valid object type: 'function', 'event' or 'enum' (or their shortcuts).`);
       process.exit(1);
     }
     const NormalizedType = ValidSearchTypes[SearchType];
@@ -242,7 +642,7 @@ var Search = new import_commander.Command("search").aliases(["s", "lookup"]).des
     const PreparedObjectName = PrepareObjectName(NormalizedObject, NormalizedType);
     if (options.debug) {
       console.log(`
-${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`);
+${import_chalk3.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/tryforge/ForgeScript/blob/dev/metadata/${NormalizedType}s.json' and potentially storing them inside cache (if caching cooldown is over).`);
     }
     ;
     Spinner.text = `Retrieving ${NormalizedType} '${object}'${options.extension ? ` from extension '${options.extension}'` : ""}...`;
@@ -254,27 +654,27 @@ ${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/
       } else {
         switch (NormalizedType) {
           case "function":
-            console.log(import_chalk2.default.cyanBright(`[Function] ${SearchResult}`));
+            console.log(import_chalk3.default.cyanBright(`[Function] ${SearchResult}`));
             break;
           case "event":
-            console.log(import_chalk2.default.greenBright(`[Event] ${SearchResult}`));
+            console.log(import_chalk3.default.greenBright(`[Event] ${SearchResult}`));
             break;
           case "enum":
-            console.log(import_chalk2.default.yellowBright(`[Enum] ${SearchResult}`));
+            console.log(import_chalk3.default.yellowBright(`[Enum] ${SearchResult}`));
             break;
         }
         ;
       }
     } else {
-      console.log(`${import_chalk2.default.red("[ERROR]")} No match found for '${object}' (${NormalizedType}).`);
+      console.log(`${import_chalk3.default.red("[ERROR]")} No match found for '${object}' (${NormalizedType}).`);
       console.log(`Try checking the spelling or use 'forge list ${NormalizedType}s' to see all available ${NormalizedType}s.`);
     }
     ;
   } catch (error) {
     Spinner.stop();
-    console.error(`${import_chalk2.default.red("[ERROR]")} ${error.message}`);
+    console.error(`${import_chalk3.default.red("[ERROR]")} ${error.message}`);
     if (error.stack && process.env.DEBUG) {
-      console.error(import_chalk2.default.gray(error.stack));
+      console.error(import_chalk3.default.gray(error.stack));
     }
     process.exit(1);
   }
@@ -282,11 +682,11 @@ ${import_chalk2.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/
 });
 
 // src/commands/system/version.ts
-var import_chalk3 = __toESM(require("chalk"));
+var import_chalk4 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
 var import_ora2 = __toESM(require("ora"));
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
-  console.log(`Current version: ${import_chalk3.default.cyan(version)}
+  console.log(`Current version: ${import_chalk4.default.cyan(version)}
 `);
   const spinner = (0, import_ora2.default)("Checking for updates...").start();
   try {
@@ -296,16 +696,16 @@ var Version = new import_commander2.Command("version").description("Returns the 
     spinner.stop();
     if (latestVersion !== version) {
       console.log(
-        `${import_chalk3.default.yellow("A new version is available!")} ${import_chalk3.default.gray(version)} \u2192 ${import_chalk3.default.green(latestVersion)}`
+        `${import_chalk4.default.yellow("A new version is available!")} ${import_chalk4.default.gray(version)} \u2192 ${import_chalk4.default.green(latestVersion)}`
       );
-      console.log(`Run ${import_chalk3.default.cyan(`npm i -g ${name}`)} to update.
+      console.log(`Run ${import_chalk4.default.cyan(`npm i -g ${name}`)} to update.
 `);
     } else {
-      console.log(import_chalk3.default.green("You are using the latest version.\n"));
+      console.log(import_chalk4.default.green("You are using the latest version.\n"));
     }
   } catch (err) {
     spinner.stop();
-    console.error(`${import_chalk3.default.red("[ERROR]")} ${err.message}`);
+    console.error(`${import_chalk4.default.red("[ERROR]")} ${err.message}`);
   }
 });
 

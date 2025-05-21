@@ -12,7 +12,7 @@
 
 
 import { Command } from 'commander';
-import { IFileMetadata } from './types';
+import { IFileMetadata } from './structure';
 import { version } from '../package.json';
 
 /**

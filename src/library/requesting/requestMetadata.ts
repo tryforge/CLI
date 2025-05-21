@@ -1,9 +1,7 @@
-import fs from 'fs/promises';
 import chalk from 'chalk';
-import path from 'path';
 
-import { getMetadataCachePath } from '../../library';
-import type { TExtension, TSearchType, TRequestResult, IFunctionMetadata, IFileMetadata } from '../../types';
+import { CacheManager } from '../../managers/CacheManager';
+import type { TExtension, TSearchType, TRequestResult, IFunctionMetadata, IFileMetadata } from '../../structure';
 
 const OneHour: number = 60 * 60 * 1000;
 
@@ -50,67 +48,61 @@ export async function RequestMetadata(
   const RepositoryName = ExtensionRepos[ExtensionName];
   const Branch = dev ? 'dev' : 'main';
   const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${Branch}/metadata/${type}s.json`;
-
-  const CachePath = getMetadataCachePath(ExtensionName, type);
+  
+  // Initialize cache manager (use current working directory for workspace)
+  const cacheManager = new CacheManager(process.cwd());
+  
+  // Define cache path for the metadata - store in user directory rather than workspace
+  const cachePath = `metadata/${ExtensionName}/${type}s.json`;
 
   if (!forceFetch) {
+    // Try to get cached data first
     try {
-      const Cached = await fs.readFile(CachePath, 'utf-8');
-      const Parsed: { cachedAt: string; data: TRequestResult } = JSON.parse(Cached);
+      // Check if cache exists first
+      const hasCachedData = await cacheManager.hasCache('user', cachePath);
+      
+      if (hasCachedData) {
+        // Get cache metadata first to display accurate timestamp
+        const cacheMetadata = await cacheManager.getCacheMetadata('user', cachePath);
 
-      const CachedDate = new Date(Parsed.cachedAt);
-      const Now = new Date();
+        // Get the actual cached data
+        const cachedContent = await cacheManager.readCache<{
+          cachedAt: string;
+          data: TRequestResult;
+        }>('user', cachePath);
+        
+        if (cachedContent && cachedContent.data) {
+          const cachedDate = new Date(cachedContent.cachedAt || (cacheMetadata?.updatedAt || new Date()).toISOString());
+          const now = new Date();
+          const isExpired = now.getTime() - cachedDate.getTime() > OneHour;
 
-      const isExpired = Now.getTime() - CachedDate.getTime() > OneHour;
+          if (debug) {
+            console.log(`${chalk.gray('[CACHE]')} Loaded from cache: ${cachePath}`);
+            console.log(`${chalk.gray('[CACHE]')} Cached at: ${cachedContent.cachedAt || (cacheMetadata?.updatedAt || "unknown").toString()}`);
+            if (isExpired) {
+              console.log(`${chalk.yellow('[CACHE]')} Cache is older than 1 hour, refetching...`);
+            }
+          }
 
+          // Return cached data if not expired
+          if (!isExpired) {
+            return cachedContent.data;
+          }
+        }
+      }
+    } catch (error) {
+      // Cache read failed, will proceed to fetch
       if (debug) {
-        console.log(`${chalk.gray('[CACHE]')} Loaded from cache: ${CachePath}`);
-        console.log(`${chalk.gray('[CACHE]')} Cached at: ${Parsed.cachedAt}`);
-        if (isExpired) {
-          console.log(`${chalk.yellow('[CACHE]')} Cache is older than 1 hour, refetching...`);
+        if (error instanceof Error) {
+          console.log(`${chalk.yellow('[CACHE]')} Failed to read cache: ${error.message}`);
+        } else {
+          console.log(`${chalk.yellow('[CACHE]')} Failed to read cache: ${String(error)}`);
         }
-      }
-
-      if (!isExpired) {
-        return Parsed.data;
-      }
-    } catch {
-      // Fallback
-      try {
-        if (debug) {
-          console.log(`\n${chalk.yellow('[DEBUG]')} Fetching from remote: ${url}`);
-        }
-
-        const Response = await fetch(url);
-        if (!Response.ok) {
-          throw new Error(`HTTP error! Status: ${Response.status}`);
-        }
-
-        const json: TRequestResult = await Response.json();
-
-        const CacheDir = path.dirname(CachePath);
-        await fs.mkdir(CacheDir, { recursive: true });
-
-        const Wrapped: { cachedAt: string; data: TRequestResult } = {
-          cachedAt: new Date().toISOString(),
-          data: json
-        };
-
-        await fs.writeFile(CachePath, JSON.stringify(Wrapped, null, 2), 'utf-8');
-
-        if (debug) {
-          console.log(`${chalk.green('[SUCCESS]')} Cached to ${CachePath}`);
-        }
-
-        return json;
-      } catch (error) {
-        console.error(`\n${chalk.red('[ERROR]')} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
-        throw error;
       }
     }
   }
 
-  // Fallback
+  // Fetch fresh data
   try {
     if (debug) {
       console.log(`\n${chalk.yellow('[DEBUG]')} Fetching from remote: ${url}`);
@@ -123,18 +115,22 @@ export async function RequestMetadata(
 
     const json: TRequestResult = await response.json();
 
-    const cacheDir = path.dirname(CachePath);
-    await fs.mkdir(cacheDir, { recursive: true });
-
-    const wrapped: { cachedAt: string; data: TRequestResult } = {
-      cachedAt: new Date().toISOString(),
+    // Cache the result with explicit cachedAt timestamp
+    const timestamp = new Date().toISOString();
+    const cacheData = {
+      cachedAt: timestamp,
       data: json
     };
 
-    await fs.writeFile(CachePath, JSON.stringify(wrapped, null, 2), 'utf-8');
+    const cacheResult = await cacheManager.writeCache('user', cachePath, cacheData);
 
     if (debug) {
-      console.log(`${chalk.green('[SUCCESS]')} Cached to ${CachePath}`);
+      if (cacheResult) {
+        console.log(`${chalk.green('[SUCCESS]')} Cached to ${cachePath}`);
+        console.log(`${chalk.gray('[CACHE]')} Cache timestamp: ${timestamp}`);
+      } else {
+        console.log(`${chalk.yellow('[WARNING]')} Failed to cache metadata`);
+      }
     }
 
     return json;
@@ -151,10 +147,10 @@ export async function RequestMetadata(
 export const FileMetadata_requestMetadata: IFileMetadata = {
   filename: 'requestMetadata.ts',
   createdAt: new Date('2025-05-11T14:22:00+02:00'),
-  updatedAt: new Date('2025-05-18T12:11:00+02:00'),
+  updatedAt: new Date('2025-05-21T15:05:00+02:00'),
   author: 'Sébastien (@striatp)',
   description: 'Fetches metadata (functions, events, enums) from Forge ecosystem GitHub repositories',
-  tags: ['CLI', 'API', 'GitHub', 'ForgeScript', 'Metadata']
+  tags: ['CLI', 'API', 'GitHub', 'ForgeScript', 'Metadata', 'Cache']
 };
 
 /**
