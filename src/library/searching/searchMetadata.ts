@@ -1,4 +1,4 @@
-import type { IFileMetadata, IFunctionMetadata, TSearchType, TRequestResult, TSearchResult } from "../../types";
+import type { IFileMetadata, IFunctionMetadata, TSearchType, TRequestResult, TSearchResult } from "../../structure";
 
 /**
  * Searches for metadata based on type and returns a match or default value.

@@ -3,7 +3,7 @@ import ora, { Ora } from 'ora';
 import { Command } from 'commander';
 
 import { RequestMetadata, SearchMetadata } from '../../library';
-import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../types';
+import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../structure';
 
 /**
  * Valid search type options for BotForge object types.
