@@ -1,7 +1,7 @@
 // Exporting structure-related types
-export type * from './structure/metadata/commandMetadata';
-export type * from './structure/metadata/fileMetadata';
-export type * from './structure/metadata/functionMetadata';
+export type * from './metadata/commandMetadata';
+export type * from './metadata/fileMetadata';
+export type * from './metadata/functionMetadata';
 
 // Exporting interfaces
 export type * from './interfaces/function';
