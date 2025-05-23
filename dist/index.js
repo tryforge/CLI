@@ -53,7 +53,8 @@ var import_promises = __toESM(require("fs/promises"));
 var import_os = __toESM(require("os"));
 var import_path = __toESM(require("path"));
 
-// src/managers/logger.ts
+// src/managers/Logger.ts
+var import_fs = __toESM(require("fs"));
 var import_chalk = __toESM(require("chalk"));
 var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
   LogLevel2[LogLevel2["TRACE"] = 0] = "TRACE";
@@ -66,190 +67,134 @@ var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
   LogLevel2[LogLevel2["SILENT"] = 7] = "SILENT";
   return LogLevel2;
 })(LogLevel || {});
-var LoggerManager = class _LoggerManager {
-  /**
-   * Creates a new Logger instance
-   * 
-   * @param config Logger configuration options
-   */
-  constructor(config = {}) {
-    this.Level = config.level ?? 2 /* INFO */;
-    this.Format = {
-      timestamp: config.format?.timestamp ?? true,
-      level: config.format?.level ?? true,
-      scope: config.format?.scope ?? true,
-      color: config.format?.color ?? true
-    };
-    this.WriteToConsole = config.console ?? true;
-    this.FilePath = config.file;
-    this.DefaultScope = config.scope;
+var Logger = class _Logger {
+  static {
+    this.level = 2 /* INFO */;
+  }
+  static {
+    this.writeToConsole = true;
+  }
+  static configure(config = {}) {
+    _Logger.level = config.level ?? 2 /* INFO */;
+    _Logger.writeToConsole = config.console ?? true;
+    _Logger.filePath = config.file;
+    _Logger.defaultScope = config.scope;
   }
   /**
-   * Creates a child logger with a specific scope
-   * 
-   * @param scope The scope name for the child logger
-   * @returns A new Logger instance with the specified scope
+   * Main log handler method, manages and format the output.
+   * @param level - The type of log to log.
+   * @param message - The message to log.
+   * @param scope - The custom scope to use.
+   * @returns void
    */
-  scope(scope) {
-    const ChildLogger = new _LoggerManager({
-      level: this.Level,
-      format: this.Format,
-      console: this.WriteToConsole,
-      file: this.FilePath,
-      scope
-    });
-    return ChildLogger;
-  }
-  /**
-   * Sets the minimum log level
-   * 
-   * @param level The minimum level to log
-   * @returns The logger instance for chaining
-   */
-  setLevel(level) {
-    this.Level = level;
-    return this;
-  }
-  /**
-   * Formats a log message with the appropriate prefixes and colors
-   * 
-   * @param level The log level
-   * @param message The message to log
-   * @param scope Optional scope override
-   * @returns Formatted log message
-   */
-  formatMessage(level, message, scope) {
-    const parts = [];
-    if (this.Format.timestamp) {
-      const now = /* @__PURE__ */ new Date();
-      const timestamp = now.toISOString().replace("T", " ").substring(0, 19);
-      parts.push(this.Format.color ? import_chalk.default.gray(`[${timestamp}]`) : `[${timestamp}]`);
+  static log(level, message, scope) {
+    if (level < _Logger.level) return;
+    const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace("T", " ").substring(0, 19);
+    const levelName = LogLevel[level].toUpperCase();
+    const finalScope = scope || _Logger.defaultScope;
+    const parts = [
+      `[${timestamp}]`,
+      `[${levelName}]`,
+      finalScope ? `[${finalScope}]` : "",
+      message
+    ].filter(Boolean).join(" ");
+    const colorizedMessage = _Logger.colorize(level, parts);
+    if (_Logger.writeToConsole) {
+      if ([5 /* ERROR */, 6 /* FATAL */].includes(level)) console.error(colorizedMessage);
+      else if (level === 4 /* WARN */) console.warn(colorizedMessage);
+      else console.log(colorizedMessage);
     }
-    if (this.Format.level) {
-      const levelName = LogLevel[level].toUpperCase();
-      let levelStr = `[${levelName}]`;
-      if (this.Format.color) {
-        switch (level) {
-          case 0 /* TRACE */:
-            levelStr = import_chalk.default.gray(levelStr);
-            break;
-          case 1 /* DEBUG */:
-            levelStr = import_chalk.default.blue(levelStr);
-            break;
-          case 2 /* INFO */:
-            levelStr = import_chalk.default.cyan(levelStr);
-            break;
-          case 3 /* SUCCESS */:
-            levelStr = import_chalk.default.green(levelStr);
-            break;
-          case 4 /* WARN */:
-            levelStr = import_chalk.default.yellow(levelStr);
-            break;
-          case 5 /* ERROR */:
-            levelStr = import_chalk.default.red(levelStr);
-            break;
-          case 6 /* FATAL */:
-            levelStr = import_chalk.default.bgRed.white(levelStr);
-            break;
-        }
-      }
-      parts.push(levelStr);
-    }
-    const finalScope = scope || this.DefaultScope;
-    if (this.Format.scope && finalScope) {
-      const scopeStr = `[${finalScope}]`;
-      parts.push(this.Format.color ? import_chalk.default.magenta(scopeStr) : scopeStr);
-    }
-    parts.push(message);
-    return parts.join(" ");
-  }
-  /**
-   * Internal logging method
-   * 
-   * @param level Log level
-   * @param message Message or object to log
-   * @param scope Optional scope override
-   */
-  log(level, message, scope) {
-    if (level < this.Level) return;
-    const messageStr = typeof message === "string" ? message : JSON.stringify(message, null, 2);
-    const formattedMessage = this.formatMessage(level, messageStr, scope);
-    if (this.WriteToConsole) {
-      switch (level) {
-        case 5 /* ERROR */:
-        case 6 /* FATAL */:
-          console.error(formattedMessage);
-          break;
-        case 4 /* WARN */:
-          console.warn(formattedMessage);
-          break;
-        default:
-          console.log(formattedMessage);
+    if (_Logger.filePath) {
+      try {
+        import_fs.default.appendFileSync(_Logger.filePath, parts + "\n", "utf-8");
+      } catch (error) {
+        console.error(`Failed to write log to file: ${error.message}`);
       }
     }
-    if (this.FilePath) {
+  }
+  /**
+   * Manages the colorization for each type.
+   * @param level - The type of log to colorize.
+   * @param message - The message that will be colorized.
+   * @returns `message`
+   */
+  static colorize(level, message) {
+    switch (level) {
+      case 0 /* TRACE */:
+        return import_chalk.default.gray(message);
+      case 1 /* DEBUG */:
+        return import_chalk.default.blue(message);
+      case 2 /* INFO */:
+        return import_chalk.default.cyan(message);
+      case 3 /* SUCCESS */:
+        return import_chalk.default.green(message);
+      case 4 /* WARN */:
+        return import_chalk.default.yellow(message);
+      case 5 /* ERROR */:
+        return import_chalk.default.red(message);
+      case 6 /* FATAL */:
+        return import_chalk.default.bgRed.white(message);
+      default:
+        return message;
     }
   }
   /**
-   * Logs a trace message (most verbose)
+   * Handles logs with type: TRACE.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  trace(message, scope) {
-    this.log(0 /* TRACE */, message, scope);
+  static trace(message, scope) {
+    _Logger.log(0 /* TRACE */, message, scope);
   }
   /**
-   * Logs a debug message
+   * Handles logs with type: DEBUG.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  debug(message, scope) {
-    this.log(1 /* DEBUG */, message, scope);
+  static debug(message, scope) {
+    _Logger.log(1 /* DEBUG */, message, scope);
   }
   /**
-   * Logs an info message
+   * Handles logs with type: INFO.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  info(message, scope) {
-    this.log(2 /* INFO */, message, scope);
+  static info(message, scope) {
+    _Logger.log(2 /* INFO */, message, scope);
   }
   /**
-   * Logs a success message
+   * Handles logs with type: SUCCESS.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  success(message, scope) {
-    this.log(3 /* SUCCESS */, message, scope);
+  static success(message, scope) {
+    _Logger.log(3 /* SUCCESS */, message, scope);
   }
   /**
-   * Logs a warning message
+   * Handles logs with type: ERROR.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  warn(message, scope) {
-    this.log(4 /* WARN */, message, scope);
+  static warn(message, scope) {
+    _Logger.log(4 /* WARN */, message, scope);
   }
   /**
-   * Logs an error message
+   * Handles logs with type: ERROR.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  error(message, scope) {
-    this.log(5 /* ERROR */, message, scope);
+  static error(message, scope) {
+    _Logger.log(5 /* ERROR */, message, scope);
   }
   /**
-   * Logs a fatal error message (most severe)
+   * Handles logs with type: FATAL.
+   * @param message - The message to output.
+   * @param scope - The debug scope to use.
    */
-  fatal(message, scope) {
-    this.log(6 /* FATAL */, message, scope);
-  }
-  /**
-   * Creates a global logger instance with default configuration
-   * 
-   * @returns A configured Logger instance
-   */
-  static createDefault() {
-    return new _LoggerManager({
-      level: 2 /* INFO */,
-      format: {
-        timestamp: false,
-        level: true,
-        scope: true,
-        color: true
-      }
-    });
+  static fatal(message, scope) {
+    _Logger.log(6 /* FATAL */, message, scope);
   }
 };
-var Logger = LoggerManager.createDefault();
 
 // src/managers/CacheManager.ts
 var CacheScheme = class {

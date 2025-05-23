@@ -76,7 +76,7 @@ abstract class CacheScheme {
 }
 
 /**
- * Manages local and workspace-specific cache directories.
+ * A class to manage local wand workspace-located cache.
  */
 export class CacheManager extends CacheScheme {
   public LocalCachePath: string;
@@ -224,7 +224,9 @@ export class CacheManager extends CacheScheme {
   /**
    * Lists all cache entries in the specified scope.
    */
-  public async listCache(scope: CacheScope): Promise<string[]> {
+  public async listCache(
+    scope: CacheScope
+  ): Promise<string[]> {
     try {
       const basePath = this.getCachePath(scope);
 
@@ -350,16 +352,3 @@ export class CacheManager extends CacheScheme {
     }
   }
 }
-
-/**
- * Metadata about the current file.
- * @internal
- */
-export const FILE_METADATA_LOGGER = {
-  filename: 'CacheManager.ts',
-  createdAt: new Date('2025-05-21T15:30:00+02:00'),
-  updatedAt: new Date('2025-05-21T19:45:00+02:00'),
-  author: 'striatp',
-  description: 'Caching manager class.',
-  tags: ['CLI', 'Cache', 'Utility']
-};

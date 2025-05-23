@@ -2,6 +2,8 @@ import chalk from 'chalk';
 import ora, { Ora } from 'ora';
 import { Command } from 'commander';
 
+import { Logger } from '../../managers/Logger';
+
 import { RequestMetadata, SearchMetadata } from '../../library';
 import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../structure';
 
