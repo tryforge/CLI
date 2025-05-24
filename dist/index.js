@@ -48,12 +48,12 @@ var import_commander = require("commander");
 // src/library/requesting/requestMetadata.ts
 var import_chalk2 = __toESM(require("chalk"));
 
-// src/managers/CacheManager.ts
+// src/managers/classes/CacheManager.ts
 var import_promises = __toESM(require("fs/promises"));
 var import_os = __toESM(require("os"));
 var import_path = __toESM(require("path"));
 
-// src/managers/Logger.ts
+// src/managers/classes/Logger.ts
 var import_fs = __toESM(require("fs"));
 var import_chalk = __toESM(require("chalk"));
 var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
@@ -196,7 +196,7 @@ var Logger = class _Logger {
   }
 };
 
-// src/managers/CacheManager.ts
+// src/managers/classes/CacheManager.ts
 var CacheScheme = class {
 };
 var CacheManager = class extends CacheScheme {
@@ -416,11 +416,160 @@ var CacheManager = class extends CacheScheme {
   }
 };
 
+// src/managers/classes/NetworkManager.ts
+var NetworkScheme = class {
+};
+var NetworkManager = class _NetworkManager extends NetworkScheme {
+  static {
+    this.DEFAULT_CONTENT_TYPE = "application/json";
+  }
+  static {
+    this.CREDENTIALS_MODE = "include";
+  }
+  constructor(baseUrl) {
+    super();
+    this.baseUrl = baseUrl;
+  }
+  /**
+   * Sends a GET request to the specified endpoint.
+   * 
+   * @param {string} endpoint - The API endpoint
+   * @param {Record<string, string>} [headers] - Optional headers for the request
+   * @returns {Promise<T | null>} The response data or null in case of failure
+   * 
+   * @example
+   * const users = await NetworkManager.get<User[]>('/users');
+   */
+  async get(endpoint, headers) {
+    return this.request("GET", endpoint, void 0, headers);
+  }
+  /**
+   * Sends a POST request to the specified endpoint.
+   * 
+   * @param {string} endpoint - The API endpoint
+   * @param {object} body - The request payload
+   * @param {Record<string, string>} [headers] - Optional headers for the request
+   * @returns {Promise<T | null>} The response data or null in case of failure
+   * 
+   * @example
+   * const newUser = await NetworkManager.post<User>('/users', { name: 'John', email: 'john@example.com' });
+   */
+  async post(endpoint, body, headers) {
+    return this.request("POST", endpoint, body, headers);
+  }
+  /**
+   * Sends a PUT request to the specified endpoint.
+   * 
+   * @param {string} endpoint - The API endpoint
+   * @param {object} body - The request payload
+   * @param {Record<string, string>} [headers] - Optional headers for the request
+   * @returns {Promise<T | null>} The response data or null in case of failure
+   * 
+   * @example
+   * const updatedUser = await NetworkManager.put<User>('/users/123', { name: 'Jane Doe' });
+   */
+  async put(endpoint, body, headers) {
+    return this.request("PUT", endpoint, body, headers);
+  }
+  /**
+   * Sends a DELETE request to the specified endpoint.
+   * 
+   * @param {string} endpoint - The API endpoint
+   * @param {Record<string, string>} [headers] - Optional headers for the request
+   * @returns {Promise<T | null>} The response data or null in case of failure
+   * 
+   * @example
+   * const success = await NetworkManager.delete<{ success: boolean }>('/users/123');
+   */
+  async delete(endpoint, headers) {
+    return this.request("DELETE", endpoint, void 0, headers);
+  }
+  /**
+   * Centralized request handling with enhanced error handling.
+   * 
+   * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
+   * @param {string} endpoint - API endpoint
+   * @param {object} [body] - Optional request payload
+   * @param {Record<string, string>} [headers] - Optional headers for the request
+   * @returns {Promise<T | null>} The response data or null in case of failure
+   */
+  async request(method, endpoint, body, headers) {
+    const url = `${this.baseUrl}${endpoint}`;
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": _NetworkManager.DEFAULT_CONTENT_TYPE,
+          ...headers
+        },
+        body: body ? JSON.stringify(body) : void 0,
+        credentials: _NetworkManager.CREDENTIALS_MODE
+      });
+      if (!response.ok) {
+        await this.handleErrorResponse(response, url, method);
+        return null;
+      }
+      return await this.parseResponse(response, url);
+    } catch (error) {
+      this.logRequestError(error, url, method);
+      return null;
+    }
+  }
+  /**
+   * Handles error responses and logs appropriate error messages.
+   * 
+   * @param {Response} response - The failed response object
+   * @param {string} url - The request URL
+   * @param {string} method - The HTTP method used
+   */
+  async handleErrorResponse(response, url, method) {
+    try {
+      const errorText = await response.text();
+      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText}`;
+      Logger.error(errorMessage, errorText ? `- ${errorText}` : "");
+    } catch (parseError) {
+      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText} - Could not parse error response`;
+      Logger.error(errorMessage);
+    }
+  }
+  /**
+   * Parses the response based on content type.
+   * 
+   * @param {Response} response - The response object
+   * @param {string} url - The request URL for logging
+   * @returns {Promise<T | null>} Parsed response data or null
+   */
+  async parseResponse(response, url) {
+    const contentType = response.headers.get("Content-Type");
+    if (!contentType || !contentType.includes(_NetworkManager.DEFAULT_CONTENT_TYPE)) {
+      Logger.warn(`Unexpected response format from ${url}. Content-Type: ${contentType}`);
+      return null;
+    }
+    try {
+      return await response.json();
+    } catch (parseError) {
+      Logger.error(`Failed to parse JSON response from ${url}: ${parseError.message}`);
+      return null;
+    }
+  }
+  /**
+   * Logs request errors with context.
+   * 
+   * @param {Error} error - The error object
+   * @param {string} url - The request URL
+   * @param {string} method - The HTTP method used
+   */
+  logRequestError(error, url, method) {
+    Logger.error(`Request failed [${method} ${url}]: ${error.message}`);
+  }
+};
+
 // src/library/requesting/requestMetadata.ts
-var OneHour = 60 * 60 * 1e3;
-async function RequestMetadata(type, extension = "forgescript", dev = false, debug = false, forceFetch = false) {
-  const ExtensionName = extension.toLowerCase();
-  const ExtensionRepos = {
+var ONE_HOUR_MS = 60 * 60 * 1e3;
+var GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/tryforge";
+async function requestMetadata(type, extension = "forgescript", dev = false, debug = false, forceFetch = false) {
+  const extensionName = extension.toLowerCase();
+  const extensionRepos = {
     forgedb: "ForgeDB",
     forgecanvas: "ForgeCanvas",
     forgetopgg: "ForgeTopGG",
@@ -428,62 +577,79 @@ async function RequestMetadata(type, extension = "forgescript", dev = false, deb
     forgemusic: "ForgeMusic",
     forgelinked: "ForgeLinked"
   };
-  if (!(ExtensionName in ExtensionRepos)) {
+  if (!(extensionName in extensionRepos)) {
     console.error(`
 ${import_chalk2.default.red("[ERROR]")} The extension '${extension}' is not supported.`);
     process.exit(1);
   }
-  const RepositoryName = ExtensionRepos[ExtensionName];
-  const Branch = dev ? "dev" : "main";
-  const url = `https://raw.githubusercontent.com/tryforge/${RepositoryName}/refs/heads/${Branch}/metadata/${type}s.json`;
+  const repositoryName = extensionRepos[extensionName];
+  const branch = dev ? "dev" : "main";
+  const endpoint = `${repositoryName}/refs/heads/${branch}/metadata/${type}s.json`;
+  const networkManager = new NetworkManager(GITHUB_RAW_BASE_URL);
   const cacheManager = new CacheManager(process.cwd());
-  const cachePath = `metadata/${ExtensionName}/${type}s.json`;
+  const cachePath = `metadata/${extensionName}/${type}s.json`;
   if (!forceFetch) {
-    try {
-      const hasCachedData = await cacheManager.hasCache("user", cachePath);
-      if (hasCachedData) {
-        const cacheMetadata = await cacheManager.getCacheMetadata("user", cachePath);
-        const cachedContent = await cacheManager.readCache("user", cachePath);
-        if (cachedContent && cachedContent.data) {
-          const cachedDate = new Date(cachedContent.cachedAt || (cacheMetadata?.updatedAt || /* @__PURE__ */ new Date()).toISOString());
-          const now = /* @__PURE__ */ new Date();
-          const isExpired = now.getTime() - cachedDate.getTime() > OneHour;
-          if (debug) {
-            console.log(`${import_chalk2.default.gray("[CACHE]")} Loaded from cache: ${cachePath}`);
-            console.log(`${import_chalk2.default.gray("[CACHE]")} Cached at: ${cachedContent.cachedAt || (cacheMetadata?.updatedAt || "unknown").toString()}`);
-            if (isExpired) {
-              console.log(`${import_chalk2.default.yellow("[CACHE]")} Cache is older than 1 hour, refetching...`);
-            }
-          }
-          if (!isExpired) {
-            return cachedContent.data;
-          }
-        }
-      }
-    } catch (error) {
-      if (debug) {
-        if (error instanceof Error) {
-          console.log(`${import_chalk2.default.yellow("[CACHE]")} Failed to read cache: ${error.message}`);
-        } else {
-          console.log(`${import_chalk2.default.yellow("[CACHE]")} Failed to read cache: ${String(error)}`);
-        }
-      }
+    const cachedResult = await tryGetCachedData(cacheManager, cachePath, debug);
+    if (cachedResult) {
+      return cachedResult;
     }
   }
+  return await fetchAndCacheMetadata(
+    networkManager,
+    cacheManager,
+    endpoint,
+    cachePath,
+    type,
+    repositoryName,
+    debug
+  );
+}
+async function tryGetCachedData(cacheManager, cachePath, debug) {
+  try {
+    const hasCachedData = await cacheManager.hasCache("user", cachePath);
+    if (!hasCachedData) {
+      return null;
+    }
+    const cacheMetadata = await cacheManager.getCacheMetadata("user", cachePath);
+    const cachedContent = await cacheManager.readCache("user", cachePath);
+    if (!cachedContent || !cachedContent.data) {
+      return null;
+    }
+    const cachedDate = new Date(
+      cachedContent.cachedAt || (cacheMetadata?.updatedAt || /* @__PURE__ */ new Date()).toISOString()
+    );
+    const now = /* @__PURE__ */ new Date();
+    const isExpired = now.getTime() - cachedDate.getTime() > ONE_HOUR_MS;
+    if (debug) {
+      console.log(`${import_chalk2.default.gray("[CACHE]")} Loaded from cache: ${cachePath}`);
+      console.log(`${import_chalk2.default.gray("[CACHE]")} Cached at: ${cachedContent.cachedAt || (cacheMetadata?.updatedAt || "unknown").toString()}`);
+      if (isExpired) {
+        console.log(`${import_chalk2.default.yellow("[CACHE]")} Cache is older than 1 hour, refetching...`);
+      }
+    }
+    return isExpired ? null : cachedContent.data;
+  } catch (error) {
+    if (debug) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`${import_chalk2.default.yellow("[CACHE]")} Failed to read cache: ${errorMessage}`);
+    }
+    return null;
+  }
+}
+async function fetchAndCacheMetadata(networkManager, cacheManager, endpoint, cachePath, type, repositoryName, debug) {
   try {
     if (debug) {
       console.log(`
-${import_chalk2.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
+${import_chalk2.default.yellow("[DEBUG]")} Fetching from remote: ${networkManager.baseUrl}/${endpoint}`);
     }
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    const response = await networkManager.get(`/${endpoint}`);
+    if (!response) {
+      throw new Error("Failed to fetch metadata: received null response");
     }
-    const json = await response.json();
     const timestamp = (/* @__PURE__ */ new Date()).toISOString();
     const cacheData = {
       cachedAt: timestamp,
-      data: json
+      data: response
     };
     const cacheResult = await cacheManager.writeCache("user", cachePath, cacheData);
     if (debug) {
@@ -494,10 +660,10 @@ ${import_chalk2.default.yellow("[DEBUG]")} Fetching from remote: ${url}`);
         console.log(`${import_chalk2.default.yellow("[WARNING]")} Failed to cache metadata`);
       }
     }
-    return json;
+    return response;
   } catch (error) {
     console.error(`
-${import_chalk2.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${RepositoryName}:`, error);
+${import_chalk2.default.red("[ERROR]")} Failed to fetch ${type} metadata for ${repositoryName}:`, error);
     throw error;
   }
 }
@@ -570,7 +736,7 @@ async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev,
     console.log(`${import_chalk3.default.yellow("[DEBUG]")} Starting the search.`);
   }
   ;
-  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
+  const Functions = await requestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
   return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 }
 var Search = new import_commander.Command("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {

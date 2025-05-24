@@ -1,4 +1,7 @@
+// 1. Node.js built-ins
 import fs from 'fs';
+
+// 2. External packages
 import chalk from 'chalk';
 
 /**
