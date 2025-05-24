@@ -80,13 +80,28 @@ interface FileScheme {
   ): Promise<boolean>;
 
   /**
+   * Asynchronously creates a new file at the specified path with the given data.
+   * 
+   * The method attempts to create a new file and write the provided data to it.
+   * If the file already exists, the operation will fail and return `false`.
+   * 
+   * @param path - The path where the new file should be created.
+   * @param data - The content to write to the file. Defaults to an empty string.
+   * @returns A promise that resolves to `true` if the file was created successfully, or `false` if an error occurred (e.g., file already exists).
+   */
+  CreateFile?(
+    path: string,
+    data: string
+  ): Promise<boolean>;
+
+  /**
    * Asynchronously creates a directory at the specified path.
    * 
    * @param path - The path where the directory should be created.
    * @param recursive - Whether to create parent directories if they do not exist. Defaults to `true`.
    * @returns A promise that resolves to `true` if the directory was created successfully, or `false` if an error occurred.
    */
-  CreateFile?(
+  CreateDirectory?(
     path: string,
     recursive: boolean
   ): Promise<boolean>;
@@ -242,8 +257,7 @@ export class FileSystem implements FileScheme {
     path: string
   ): Promise<string> {
     try {
-      const data = await fs.readFile(path, 'utf-8');
-      return data
+      return await fs.readFile(path, 'utf-8')
     } catch(error: unknown) {
       if (error instanceof Error) {
         return error.message
@@ -333,8 +347,7 @@ export class FileSystem implements FileScheme {
     path: string
   ): Promise<any | null> {
     try {
-      const data = await FileSystem.ReadFile(path);
-      return JSON.parse(data);
+      return JSON.parse(await FileSystem.ReadFile(path));
     } catch {
       return null
     }
@@ -351,13 +364,34 @@ export class FileSystem implements FileScheme {
     object: any
   ): Promise<boolean> {
     try {
-      const data = JSON.stringify(object)
-      await fs.writeFile(path, data, 'utf-8')
+      await fs.writeFile(path, JSON.stringify(object), 'utf-8')
       return true
     } catch {
       return false
     }
   };
+
+  /**
+   * Asynchronously creates a new file at the specified path with the given data.
+   * 
+   * The method attempts to create a new file and write the provided data to it.
+   * If the file already exists, the operation will fail and return `false`.
+   * 
+   * @param path - The path where the new file should be created.
+   * @param data - The content to write to the file. Defaults to an empty string.
+   * @returns A promise that resolves to `true` if the file was created successfully, or `false` if an error occurred (e.g., file already exists).
+   */
+  public static async CreateFile(
+    path: string,
+    data: string = ''
+  ): Promise<boolean> {
+    try {
+      await fs.writeFile(path, data, { flag: 'wx' });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   /**
    * Asynchronously creates a directory at the specified path.
@@ -366,7 +400,7 @@ export class FileSystem implements FileScheme {
    * @param recursive - Whether to create parent directories if they do not exist. Defaults to `true`.
    * @returns A promise that resolves to `true` if the directory was created successfully, or `false` if an error occurred.
    */
-  public static async CreateFile(
+  public static async CreateDirectory(
     path: string,
     recursive: boolean = true
   ): Promise<boolean> {
@@ -447,8 +481,7 @@ export class FileSystem implements FileScheme {
     path: string
   ): Promise<Buffer | null> {
     try {
-      const data = await fs.readFile(path)
-      return data
+      return await fs.readFile(path)
     } catch {
       return null
     }
@@ -500,8 +533,7 @@ export class FileSystem implements FileScheme {
     path: string
   ): Promise<boolean> {
     try {
-      const stats = await fs.stat(path)
-      return stats.isDirectory()
+      return (await fs.stat(path)).isDirectory()
     } catch {
       return false
     }
@@ -517,8 +549,7 @@ export class FileSystem implements FileScheme {
     path: string
   ): Promise<boolean> {
     try {
-      const stats = await fs.stat(path)
-      return stats.isFile()
+      return (await fs.stat(path)).isFile()
     } catch {
       return false
     }
@@ -588,7 +619,7 @@ export class FileSystem implements FileScheme {
       }
     } catch {
       try {
-        await FileSystem.CreateFile(path, true)
+        await FileSystem.CreateDirectory(path, true)
         return {
           success: true,
           created: true,
