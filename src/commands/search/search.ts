@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import ora, { Ora } from 'ora';
 import { Command } from 'commander';
 
-import { Logger } from '../../managers/Logger';
+import { Logger } from '../../managers/classes/Logger';
 
-import { RequestMetadata, SearchMetadata } from '../../library';
+import { SearchMetadata, requestMetadata } from '../../library';
 import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../structure';
 
 /**
@@ -65,7 +65,7 @@ async function ExecuteSearch(
   if (debug) {
     console.log(`${chalk.yellow('[DEBUG]')} Starting the search.`)
   };
-  const Functions = await RequestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
+  const Functions = await requestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
   
   return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 };
