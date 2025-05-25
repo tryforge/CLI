@@ -5,7 +5,7 @@ import path from 'path';
 import { Stats } from 'fs';
 
 /**
- * An interface representing the FileSystem class.
+ * An interface representing how the FileSystem class is structured.
  */
 interface FileScheme {
   /**
