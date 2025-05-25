@@ -1,5 +1,5 @@
 /**
- * An interface representing the NetworkManager class.
+ * An interface representing how the NetworkManager class is structured.
  */
 interface NetworkScheme {
   /**
