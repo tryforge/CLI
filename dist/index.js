@@ -49,12 +49,515 @@ var import_commander = require("commander");
 var import_chalk2 = __toESM(require("chalk"));
 
 // src/managers/classes/CacheManager.ts
-var import_promises = __toESM(require("fs/promises"));
+var import_path2 = __toESM(require("path"));
+
+// src/managers/classes/FileSystem.ts
 var import_os = __toESM(require("os"));
+var import_promises = __toESM(require("fs/promises"));
 var import_path = __toESM(require("path"));
+var FileSystem = class _FileSystem {
+  /**
+   * Reads the contents of a file at the given path.
+   * @param path - The path to the file.
+   * @returns A promise that resolves to the file contents as a string or Buffer.
+   */
+  static async ReadFile(path5) {
+    try {
+      return await import_promises.default.readFile(path5, "utf-8");
+    } catch (error) {
+      if (error instanceof Error) {
+        return error.message;
+      } else {
+        return "An unexpected error occured.";
+      }
+    }
+  }
+  /**
+   * Writes data to a file at the given path.
+   * @param path - The path to the file.
+   * @param data - The data to write to the file.
+   * @returns A promise that resolves to true if the write was successful, false otherwise.
+   */
+  static async WriteFile(path5, data) {
+    try {
+      await import_promises.default.writeFile(path5, data, "utf-8");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Copies a file from the source path to the destination path.
+   * @param sourcePath - The path to the source file.
+   * @param destinationPath - The path to the destination file.
+   * @returns A promise that resolves to true if the copy was successful, false otherwise.
+   */
+  static async CopyFile(sourcePath, destinationPath) {
+    try {
+      await import_promises.default.copyFile(sourcePath, destinationPath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Moves a file from the source path to the destination path.
+   * @param sourcePath - The path to the source file.
+   * @param destinationPath - The path to the destination file.
+   * @returns A promise that resolves to true if the move was successful, false otherwise.
+   */
+  static async MoveFile(sourcePath, destinationPath) {
+    try {
+      await import_promises.default.rename(sourcePath, destinationPath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Checks if a file exists at the given path.
+   * @param path - The path to the file.
+   * @returns A promise that resolves to true if the file exists, false otherwise.
+   */
+  static async FileExists(path5) {
+    try {
+      await import_promises.default.access(path5);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Reads a JSON file from the specified path and parses its contents.
+   *
+   * @param path - The file system path to the JSON file.
+   * @returns A promise that resolves to the parsed JSON object if successful, or `null` if an error occurs (e.g., file not found or invalid JSON).
+   */
+  static async ReadJSON(path5) {
+    try {
+      return JSON.parse(await _FileSystem.ReadFile(path5));
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * Writes an object as JSON to a file at the given path.
+   * @param path - The path to the file.
+   * @param object - The object to serialize and write as JSON.
+   * @returns A promise that resolves to true if the write was successful, false otherwise.
+   */
+  static async WriteJSON(path5, object) {
+    try {
+      await import_promises.default.writeFile(path5, JSON.stringify(object), "utf-8");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Asynchronously creates a new file at the specified path with the given data.
+   * 
+   * The method attempts to create a new file and write the provided data to it.
+   * If the file already exists, the operation will fail and return `false`.
+   * 
+   * @param path - The path where the new file should be created.
+   * @param data - The content to write to the file. Defaults to an empty string.
+   * @returns A promise that resolves to `true` if the file was created successfully, or `false` if an error occurred (e.g., file already exists).
+   */
+  static async CreateFile(path5, data = "") {
+    try {
+      await import_promises.default.writeFile(path5, data, { flag: "wx" });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Asynchronously creates a directory at the specified path.
+   * 
+   * @param path - The path where the directory should be created.
+   * @param recursive - Whether to create parent directories if they do not exist. Defaults to `true`.
+   * @returns A promise that resolves to `true` if the directory was created successfully, or `false` if an error occurred.
+   */
+  static async CreateDirectory(path5, recursive = true) {
+    try {
+      await import_promises.default.mkdir(path5, { recursive });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Deletes a file at the specified path.
+   *
+   * @param path - The path to the file to be deleted.
+   * @returns A promise that resolves to `true` if the file was successfully deleted, or `false` if an error occurred.
+   */
+  static async DeleteFile(path5) {
+    try {
+      await import_promises.default.unlink(path5);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Deletes a directory at the specified path.
+   *
+   * @param path - The path to the directory to delete.
+   * @param recursive - Whether to delete directories recursively.
+   * @returns A promise that resolves to `true` if the directory was deleted successfully, or `false` if an error occurred.
+   */
+  static async DeleteDirectory(path5, recursive) {
+    try {
+      await import_promises.default.rmdir(path5, { recursive });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Appends data to a file at the specified path.
+   *
+   * If the file does not exist, it will be created. The data can be a string or a Buffer.
+   * Returns `true` if the operation succeeds, or `false` if an error occurs.
+   *
+   * @param path - The path to the file where data should be appended.
+   * @param data - The data to append to the file, as a string or Buffer.
+   * @returns A promise that resolves to `true` if the append operation was successful, or `false` otherwise.
+   */
+  static async AppendToFile(path5, data) {
+    try {
+      await import_promises.default.appendFile(path5, data);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Reads the contents of a file at the specified path and returns it as a Buffer.
+   * 
+   * @param path - The path to the file to be read.
+   * @returns A Promise that resolves to a Buffer containing the file's contents, or `null` if the file cannot be read.
+   */
+  static async ReadFileBuffer(path5) {
+    try {
+      return await import_promises.default.readFile(path5);
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * Retrieves the file extension from the provided file path.
+   *
+   * @param filePath - The path of the file whose extension is to be extracted.
+   * @returns The file extension, including the leading dot (e.g., ".txt"). Returns an empty string if the file has no extension.
+   */
+  static GetFileExtension(filePath) {
+    return import_path.default.extname(filePath);
+  }
+  /**
+   * Retrieves the file name from a given file path.
+   *
+   * @param filePath - The full path to the file.
+   * @returns The name of the file extracted from the provided path.
+   */
+  static GetFileName(filePath) {
+    return import_path.default.basename(filePath);
+  }
+  /**
+   * Returns the parent directory of the specified file path.
+   *
+   * @param filePath - The path of the file or directory.
+   * @returns The path of the parent directory.
+   */
+  static GetParentDirectory(filePath) {
+    return import_path.default.dirname(filePath);
+  }
+  /**
+   * Determines whether the specified path refers to a directory.
+   *
+   * @param path - The file system path to check.
+   * @returns A promise that resolves to `true` if the path is a directory, or `false` otherwise.
+   */
+  static async IsDirectory(path5) {
+    try {
+      return (await import_promises.default.stat(path5)).isDirectory();
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Determines whether the specified path refers to a file.
+   *
+   * @param path - The path to check.
+   * @returns A promise that resolves to `true` if the path is a file, or `false` otherwise.
+   */
+  static async IsFile(path5) {
+    try {
+      return (await import_promises.default.stat(path5)).isFile();
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Retrieves the current user's home directory path.
+   *
+   * @returns {string} The absolute path to the user's home directory.
+   */
+  static GetHomePath() {
+    return import_os.default.homedir();
+  }
+  /**
+   * Returns the operating system's default directory for temporary files.
+   *
+   * @returns {string} The path to the temporary directory.
+   */
+  static GetTempDirectory() {
+    return import_os.default.tmpdir();
+  }
+  /**
+   * Returns the current working directory of the Node.js process.
+   *
+   * @returns {string} The absolute path of the current workspace directory.
+   */
+  static GetWorkspaceDirectory() {
+    return process.cwd();
+  }
+  /**
+   * Lists the contents of a directory at the given path.
+   * @param path - The path to the directory.
+   * @returns A promise that resolves to an array of file and directory names.
+   */
+  static async ListDirectory(path5) {
+    try {
+      return await import_promises.default.readdir(path5);
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Retrieves file statistics for the file at the given path.
+   * @returns A promise that resolves to the file statistics (fs.Stats).
+   */
+  static async GetFileStats(path5) {
+    try {
+      return await import_promises.default.stat(path5);
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Ensures that a directory exists at the given path, creating it if necessary.
+   * @param path - The path to the directory.
+   * @returns A promise that resolves when the directory exists.
+   */
+  static async EnsureDirectory(path5) {
+    try {
+      await _FileSystem.FileExists(path5);
+      return {
+        success: true,
+        created: false,
+        path: path5
+      };
+    } catch {
+      try {
+        await _FileSystem.CreateDirectory(path5, true);
+        return {
+          success: true,
+          created: true,
+          path: path5
+        };
+      } catch {
+        return {
+          success: false,
+          created: false,
+          path: path5
+        };
+      }
+    }
+  }
+};
+
+// src/managers/classes/CacheManager.ts
+var CacheManager = class {
+  /**
+   * Writes cache data to a JSON file at the specified path, based on the given cache scope.
+   *
+   * @template T - The type of the cache content to write.
+   * @param scope - The scope of the cache, either 'user' or workspace.
+   * @param filePath - The relative file path where the cache should be written.
+   * @param data - The cache content to write to the file.
+   * @returns A promise that resolves to `true` if the write operation was successful, otherwise `false`.
+   */
+  static async WriteCache(scope, filePath, data) {
+    const cachePath = scope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    return FileSystem.WriteJSON(cachePath, data);
+  }
+  /**
+   * Reads and returns the cached content from a specified file path within the given cache scope.
+   *
+   * @template T - The type of the cached content.
+   * @param scope - The cache scope, either 'user' or 'workspace', determining the base directory.
+   * @param filePath - The relative path to the cache file.
+   * @returns A promise that resolves to the parsed cache content of type `CacheContent<T>`.
+   */
+  static async ReadCache(scope, filePath) {
+    const cachePath = scope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    return await FileSystem.ReadJSON(cachePath);
+  }
+  /**
+   * Clears the cache for the specified scope and file path.
+   *
+   * Depending on the `deleteFile` flag, this method either deletes the cache file
+   * or overwrites it with an empty cache object.
+   *
+   * @param scope - The cache scope, either 'user' or 'workspace'.
+   * @param filePath - The relative path to the cache file.
+   * @param deleteFile - If `true`, deletes the cache file; otherwise, overwrites it with an empty cache object. Defaults to `false`.
+   * @returns A promise that resolves to `true` if the operation was successful, or `false` otherwise.
+   */
+  static async ClearCache(scope, filePath, deleteFile = false) {
+    const cachePath = scope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    if (deleteFile) {
+      return await FileSystem.DeleteFile(cachePath);
+    } else {
+      const emptyCache = { updatedAt: /* @__PURE__ */ new Date(), data: null };
+      return await FileSystem.WriteJSON(cachePath, emptyCache);
+    }
+  }
+  /**
+   * Checks whether a cache file exists at the specified path within the given scope.
+   *
+   * @param scope - The scope of the cache, either 'user' or 'workspace'.
+   * @param filePath - The relative path to the cache file.
+   * @returns A promise that resolves to `true` if the cache file exists, or `false` otherwise.
+   */
+  static async CacheExists(scope, filePath) {
+    const cachePath = scope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    return await FileSystem.FileExists(cachePath);
+  }
+  /**
+   * Clears all cached data within the specified scope by deleting the corresponding cache directory.
+   *
+   * @param scope - The scope of the cache to clear. Use `'user'` to clear user-level cache,
+   *                or another value to clear workspace-level cache.
+   * @returns A promise that resolves to `true` if the cache directory was successfully deleted, otherwise `false`.
+   */
+  static async ClearAllCache(scope) {
+    const cacheDir = scope === "user" ? FileSystem.GetHomePath() : FileSystem.GetWorkspaceDirectory();
+    return await FileSystem.DeleteDirectory(cacheDir, true);
+  }
+  /**
+   * Retrieves the cache metadata for a given file path and scope.
+   *
+   * This method attempts to read a JSON file from the cache location determined by the provided scope
+   * ('user' or workspace). If the file exists and contains an `updatedAt` property, it returns an object
+   * with the `updatedAt` value. Otherwise, it returns `null`.
+   *
+   * @param scope - The cache scope, either 'user' or workspace.
+   * @param filePath - The relative path to the cache file.
+   * @returns A promise that resolves to the cache metadata containing `updatedAt`, or `null` if not found.
+   */
+  static async CacheMetadata(scope, filePath) {
+    const cachePath = scope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    const content = await FileSystem.ReadJSON(cachePath);
+    if (content && content.updatedAt) {
+      return { updatedAt: content.updatedAt };
+    }
+    return null;
+  }
+  /**
+   * Migrates a cache file from one scope to another by copying its contents.
+   *
+   * @param fromScope - The source cache scope ('user' or 'workspace').
+   * @param toScope - The destination cache scope ('user' or 'workspace').
+   * @param filePath - The relative path of the cache file to migrate.
+   * @returns A promise that resolves to `true` if the migration was successful, or `false` if the source file does not exist or cannot be read.
+   */
+  static async MigrateCache(fromScope, toScope, filePath) {
+    const fromPath = fromScope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    const toPath = toScope === "user" ? import_path2.default.join(FileSystem.GetHomePath(), filePath) : import_path2.default.join(FileSystem.GetWorkspaceDirectory(), filePath);
+    if (!await FileSystem.FileExists(fromPath)) return false;
+    const data = await FileSystem.ReadJSON(fromPath);
+    if (!data) return false;
+    return await FileSystem.WriteJSON(toPath, data);
+  }
+};
+
+// src/managers/classes/ErrorHandler.ts
+var import_path3 = __toESM(require("path"));
+var ErrorManager = class {
+  static {
+    /**
+     * The default error log file path (relative to workspace directory).
+     */
+    this.LogFile = "error.log";
+  }
+  /**
+   * Logs an error message to the ForgeCLI error log file.
+   *
+   * @param error - The error object or string to log.
+   * @param context - Optional context information to include with the error.
+   * @returns A promise that resolves to `true` if the log entry was successfully appended, or `false` otherwise.
+   */
+  static async LogError(error, context) {
+    const logPath = import_path3.default.join(FileSystem.GetWorkspaceDirectory(), ".forge", this.LogFile);
+    const logEntry = `[${(/* @__PURE__ */ new Date()).toISOString()}] ${this.FormatError(error, context)}
+`;
+    return FileSystem.AppendToFile(logPath, logEntry);
+  }
+  /**
+   * Formats an error message with optional context and stack trace.
+   *
+   * @param error - The error object or string to format.
+   * @param context - Optional context information to prepend to the message.
+   * @returns The formatted error message, including context and stack trace if available.
+   */
+  static FormatError(error, context) {
+    let msg = typeof error === "string" ? error : error.message;
+    if (context) msg = `[${context}] ${msg}`;
+    if (error instanceof Error && error.stack) {
+      msg += `
+Stack: ${error.stack}`;
+    }
+    return msg;
+  }
+  /**
+   * Handles an error by optionally logging it and notifying the user.
+   *
+   * @param error - The error object or message string to handle.
+   * @param context - Optional context information about where the error occurred.
+   * @param log - Whether to log the error (default: false).
+   * @returns A promise that resolves when the error has been handled.
+   */
+  static async Handle(error, log = false, context) {
+    log ? await this.LogError(error, context) : () => {
+    };
+    this.NotifyUser(error, context);
+  }
+  /**
+   * Clears the contents of the error log file.
+   *
+   * @param logPath - Optional. The path to the error log file. If not provided, the default log file path is used.
+   * @returns A promise that resolves to `true` if the log file was successfully cleared, or `false` otherwise.
+   */
+  static async ClearErrorLog(logPath) {
+    const pathToLog = logPath || import_path3.default.join(FileSystem.GetWorkspaceDirectory(), this.LogFile);
+    return FileSystem.WriteFile(pathToLog, "");
+  }
+  /**
+   * Logs a formatted error message to the console for user notification.
+   *
+   * @param error - The error object or message string to notify the user about.
+   * @param context - Optional context information to provide additional details about the error.
+   */
+  static NotifyUser(error, context) {
+    console.error(this.FormatError(error, context));
+  }
+};
 
 // src/managers/classes/Logger.ts
-var import_fs = __toESM(require("fs"));
 var import_chalk = __toESM(require("chalk"));
 var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
   LogLevel2[LogLevel2["TRACE"] = 0] = "TRACE";
@@ -69,498 +572,247 @@ var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
 })(LogLevel || {});
 var Logger = class _Logger {
   static {
-    this.level = 2 /* INFO */;
-  }
-  static {
-    this.writeToConsole = true;
-  }
-  static configure(config = {}) {
-    _Logger.level = config.level ?? 2 /* INFO */;
-    _Logger.writeToConsole = config.console ?? true;
-    _Logger.filePath = config.file;
-    _Logger.defaultScope = config.scope;
+    this.currentLevel = 2 /* INFO */;
   }
   /**
-   * Main log handler method, manages and format the output.
-   * @param level - The type of log to log.
-   * @param message - The message to log.
-   * @param scope - The custom scope to use.
-   * @returns void
+   * Sets the current log level.
+   * @param level The log level to set.
    */
-  static log(level, message, scope) {
-    if (level < _Logger.level) return;
-    const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace("T", " ").substring(0, 19);
-    const levelName = LogLevel[level].toUpperCase();
-    const finalScope = scope || _Logger.defaultScope;
-    const parts = [
-      `[${timestamp}]`,
-      `[${levelName}]`,
-      finalScope ? `[${finalScope}]` : "",
-      message
-    ].filter(Boolean).join(" ");
-    const colorizedMessage = _Logger.colorize(level, parts);
-    if (_Logger.writeToConsole) {
-      if ([5 /* ERROR */, 6 /* FATAL */].includes(level)) console.error(colorizedMessage);
-      else if (level === 4 /* WARN */) console.warn(colorizedMessage);
-      else console.log(colorizedMessage);
-    }
-    if (_Logger.filePath) {
-      try {
-        import_fs.default.appendFileSync(_Logger.filePath, parts + "\n", "utf-8");
-      } catch (error) {
-        console.error(`Failed to write log to file: ${error.message}`);
-      }
-    }
+  static setLevel(level) {
+    _Logger.currentLevel = level;
   }
   /**
-   * Manages the colorization for each type.
-   * @param level - The type of log to colorize.
-   * @param message - The message that will be colorized.
-   * @returns `message`
+   * Logs a message at the specified log level.
+   * @param level The log level.
+   * @param args The message arguments.
    */
-  static colorize(level, message) {
+  static log(level, ...args) {
+    if (level < _Logger.currentLevel) return;
+    const prefix = LogLevel[level];
     switch (level) {
       case 0 /* TRACE */:
-        return import_chalk.default.gray(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.gray(prefix)} ${import_chalk.default.gray(arg)}`));
+        break;
       case 1 /* DEBUG */:
-        return import_chalk.default.blue(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.yellow(prefix)} ${import_chalk.default.yellow(arg)}`));
+        break;
       case 2 /* INFO */:
-        return import_chalk.default.cyan(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.blue(prefix)} ${import_chalk.default.blue(arg)}`));
+        break;
       case 3 /* SUCCESS */:
-        return import_chalk.default.green(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.green(prefix)} ${import_chalk.default.green(arg)}`));
+        break;
       case 4 /* WARN */:
-        return import_chalk.default.yellow(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.yellow(prefix)} ${import_chalk.default.yellow(arg)}`));
+        break;
       case 5 /* ERROR */:
-        return import_chalk.default.red(message);
+        args.forEach((arg) => console.log(`${import_chalk.default.red(prefix)} ${import_chalk.default.red(arg)}`));
+        break;
       case 6 /* FATAL */:
-        return import_chalk.default.bgRed.white(message);
-      default:
-        return message;
+        args.forEach((arg) => console.log(`${import_chalk.default.red(prefix)} ${import_chalk.default.red(arg)}`));
+        break;
     }
   }
   /**
-   * Handles logs with type: TRACE.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a trace message.
+   * @param args The message arguments.
    */
-  static trace(message, scope) {
-    _Logger.log(0 /* TRACE */, message, scope);
+  trace(...args) {
+    _Logger.log(0 /* TRACE */, ...args);
   }
   /**
-   * Handles logs with type: DEBUG.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a debug message.
+   * @param args The message arguments.
    */
-  static debug(message, scope) {
-    _Logger.log(1 /* DEBUG */, message, scope);
+  debug(...args) {
+    _Logger.log(1 /* DEBUG */, ...args);
   }
   /**
-   * Handles logs with type: INFO.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs an info message.
+   * @param args The message arguments.
    */
-  static info(message, scope) {
-    _Logger.log(2 /* INFO */, message, scope);
+  info(...args) {
+    _Logger.log(2 /* INFO */, ...args);
   }
   /**
-   * Handles logs with type: SUCCESS.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a success message.
+   * @param args The message arguments.
    */
-  static success(message, scope) {
-    _Logger.log(3 /* SUCCESS */, message, scope);
+  success(...args) {
+    _Logger.log(3 /* SUCCESS */, ...args);
   }
   /**
-   * Handles logs with type: ERROR.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a warning message.
+   * @param args The message arguments.
    */
-  static warn(message, scope) {
-    _Logger.log(4 /* WARN */, message, scope);
+  warn(...args) {
+    _Logger.log(4 /* WARN */, ...args);
   }
   /**
-   * Handles logs with type: ERROR.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs an error message.
+   * @param args The message arguments.
    */
-  static error(message, scope) {
-    _Logger.log(5 /* ERROR */, message, scope);
+  error(...args) {
+    _Logger.log(5 /* ERROR */, ...args);
   }
   /**
-   * Handles logs with type: FATAL.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a fatal error message.
+   * @param args The message arguments.
    */
-  static fatal(message, scope) {
-    _Logger.log(6 /* FATAL */, message, scope);
-  }
-};
-
-// src/managers/classes/CacheManager.ts
-var CacheScheme = class {
-};
-var CacheManager = class extends CacheScheme {
-  constructor(WorkspaceRoot) {
-    super();
-    this.WorkspaceRoot = WorkspaceRoot;
-    this.LocalCachePath = import_path.default.join(import_os.default.homedir() || "", ".forge");
-    this.WorkspaceCachePath = import_path.default.join(this.WorkspaceRoot, ".forge");
-  }
-  /**
-   * Ensures the directory exists, returns true if it exists/was created successfully.
-   */
-  async localCacheExists() {
-    try {
-      await import_promises.default.mkdir(
-        this.LocalCachePath,
-        { recursive: true }
-      );
-      return true;
-    } catch {
-      Logger.error(`Failed to ensure local cache directory: ${this.LocalCachePath}.`);
-      return false;
-    }
-  }
-  /**
-   * Ensures a workspace cache directory exists.
-   */
-  async workspaceCacheExists() {
-    try {
-      await import_promises.default.mkdir(
-        this.WorkspaceCachePath,
-        { recursive: true }
-      );
-      return true;
-    } catch {
-      Logger.error(`Failed to ensure workspace cache directory: ${this.WorkspaceCachePath}.`);
-      return false;
-    }
-  }
-  /**
-   * Gets the full path for a cache entry.
-   */
-  getCachePath(scope, cachePath) {
-    const basePath = scope === "user" ? this.LocalCachePath : this.WorkspaceCachePath;
-    if (!cachePath) {
-      return basePath;
-    }
-    return import_path.default.join(basePath, cachePath);
-  }
-  /**
-   * Writes data to cache.
-   */
-  async writeCache(scope, cachePath, data) {
-    try {
-      if (scope === "user") {
-        await this.localCacheExists();
-      } else {
-        await this.workspaceCacheExists();
-      }
-      const fullPath = this.getCachePath(
-        scope,
-        cachePath.endsWith(".json") ? cachePath : `${cachePath}.json`
-      );
-      const parentDirectory = import_path.default.dirname(fullPath);
-      await import_promises.default.mkdir(
-        parentDirectory,
-        { recursive: true }
-      );
-      const cacheContent = {
-        updatedAt: /* @__PURE__ */ new Date(),
-        data
-      };
-      if (await this.hasCache(scope, cachePath)) {
-        const existingCache = await this.readCache(scope, cachePath);
-        if (existingCache && existingCache.updatedAt) {
-          cacheContent.updatedAt = new Date(existingCache.updatedAt);
-        }
-      }
-      await import_promises.default.writeFile(
-        fullPath,
-        JSON.stringify(cacheContent, null, 2),
-        "utf-8"
-      );
-      return true;
-    } catch {
-      Logger.error(`Failed to write to cache: ${cachePath}.`);
-      return false;
-    }
-  }
-  /**
-   * Reads data from cache.
-   */
-  async readCache(scope, cachePath) {
-    try {
-      const fullPath = this.getCachePath(scope, cachePath);
-      const fileContent = await import_promises.default.readFile(fullPath, "utf-8");
-      const cacheContent = JSON.parse(fileContent);
-      return cacheContent.data;
-    } catch {
-      return null;
-    }
-  }
-  /**
-   * Checks if cache exists at the given path.
-   */
-  async hasCache(scope, cachePath) {
-    try {
-      const fullPath = this.getCachePath(scope, cachePath);
-      await import_promises.default.access(fullPath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  /**
-   * Lists all cache entries in the specified scope.
-   */
-  async listCache(scope) {
-    try {
-      const basePath = this.getCachePath(scope);
-      const listJsonFiles = async (dirPath, baseDir) => {
-        const entries = await import_promises.default.readdir(
-          dirPath,
-          { withFileTypes: true }
-        );
-        const files = [];
-        for (const entry of entries) {
-          const fullPath = import_path.default.join(dirPath, entry.name);
-          const relativePath = import_path.default.relative(baseDir, fullPath);
-          if (entry.isDirectory()) {
-            const nestedFiles = await listJsonFiles(fullPath, baseDir);
-            files.push(...nestedFiles);
-          } else if (entry.isFile() && entry.name.endsWith(".json")) {
-            files.push(relativePath);
-          }
-        }
-        return files;
-      };
-      if (scope === "user") {
-        await this.localCacheExists();
-      } else {
-        await this.workspaceCacheExists();
-      }
-      return await listJsonFiles(basePath, basePath);
-    } catch {
-      Logger.error(`Failed to list cache for scope: ${scope}.`);
-      return [];
-    }
-  }
-  /**
-   * Gets metadata for a cache entry.
-   */
-  async getCacheMetadata(scope, cachePath) {
-    try {
-      if (!cachePath) {
-        return null;
-      }
-      const fullPath = this.getCachePath(scope, cachePath);
-      const fileContent = await import_promises.default.readFile(fullPath, "utf-8");
-      const cacheContent = JSON.parse(fileContent);
-      return {
-        updatedAt: new Date(cacheContent.updatedAt)
-      };
-    } catch {
-      return null;
-    }
-  }
-  /**
-   * Clears cache entries.
-   */
-  async clearCache(scope, cachePath) {
-    try {
-      if (cachePath) {
-        const fullPath = this.getCachePath(scope, cachePath);
-        let data = null;
-        try {
-          data = await this.readCache(scope, cachePath);
-        } catch {
-        }
-        await import_promises.default.unlink(fullPath);
-        return {
-          success: true,
-          data
-        };
-      } else {
-        const basePath = scope === "user" ? this.LocalCachePath : this.WorkspaceCachePath;
-        try {
-          await import_promises.default.access(basePath);
-          await import_promises.default.rm(
-            basePath,
-            { recursive: true, force: true }
-          );
-          if (scope === "user") {
-            await this.localCacheExists();
-          } else {
-            await this.workspaceCacheExists();
-          }
-        } catch {
-          if (scope === "user") {
-            await this.localCacheExists();
-          } else {
-            await this.workspaceCacheExists();
-          }
-        }
-        return {
-          success: true,
-          data: {}
-        };
-      }
-    } catch (error) {
-      Logger.error(`Failed to clear cache: ${scope}/${cachePath || "all"}.`);
-      return {
-        success: false,
-        data: {}
-      };
-    }
+  fatal(...args) {
+    _Logger.log(6 /* FATAL */, ...args);
   }
 };
 
 // src/managers/classes/NetworkManager.ts
-var NetworkScheme = class {
-};
-var NetworkManager = class _NetworkManager extends NetworkScheme {
-  static {
-    this.DEFAULT_CONTENT_TYPE = "application/json";
-  }
-  static {
-    this.CREDENTIALS_MODE = "include";
-  }
+var NetworkManager = class {
+  /**
+   * The constructor to create the instance of the class.
+   * @param baseUrl The base URL to work with.
+   */
   constructor(baseUrl) {
-    super();
-    this.baseUrl = baseUrl;
+    this.BaseURL = baseUrl;
   }
   /**
-   * Sends a GET request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const users = await NetworkManager.get<User[]>('/users');
+   * Sends a GET request to the specified endpoint and returns the response data.
+   *
+   * @typeParam T - The expected response data type.
+   * @param endpoint - The API endpoint to send the GET request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response data of type `T`, or `null` if the request fails.
    */
-  async get(endpoint, headers) {
-    return this.request("GET", endpoint, void 0, headers);
+  async Get(endpoint, headers = {}) {
+    return this.Request("GET", endpoint, void 0, headers);
   }
   /**
-   * Sends a POST request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {object} body - The request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const newUser = await NetworkManager.post<User>('/users', { name: 'John', email: 'john@example.com' });
+   * Sends a POST request to the specified endpoint with the provided body and headers.
+   *
+   * @template T - The expected response type.
+   * @param endpoint - The API endpoint to send the request to.
+   * @param body - The request payload to be sent in the body of the POST request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  async post(endpoint, body, headers) {
-    return this.request("POST", endpoint, body, headers);
+  async Post(endpoint, body, headers = {}) {
+    return this.Request("POST", endpoint, headers, body);
   }
   /**
-   * Sends a PUT request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {object} body - The request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const updatedUser = await NetworkManager.put<User>('/users/123', { name: 'Jane Doe' });
+   * Sends an HTTP PUT request to the specified endpoint with the provided body and headers.
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the PUT request to.
+   * @param body - The request payload to be sent in the body of the PUT request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  async put(endpoint, body, headers) {
-    return this.request("PUT", endpoint, body, headers);
+  async Put(endpoint, body, headers = {}) {
+    return this.Request("PUT", endpoint, headers, body);
   }
   /**
    * Sends a DELETE request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const success = await NetworkManager.delete<{ success: boolean }>('/users/123');
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the DELETE request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  async delete(endpoint, headers) {
-    return this.request("DELETE", endpoint, void 0, headers);
+  async Delete(endpoint, headers = {}) {
+    return this.Request("DELETE", endpoint, void 0, headers);
   }
   /**
-   * Centralized request handling with enhanced error handling.
-   * 
-   * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
-   * @param {string} endpoint - API endpoint
-   * @param {object} [body] - Optional request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
+   * Sends an HTTP request to the specified endpoint using the given method, body, and headers.
+   *
+   * @template T - The expected response type.
+   * @param method - The HTTP method to use (e.g., 'GET', 'POST', 'PUT', 'DELETE').
+   * @param endpoint - The endpoint path to append to the base URL.
+   * @param body - Optional request payload to send as JSON.
+   * @param headers - Optional additional headers to include in the request.
+   * @returns A promise that resolves to the parsed JSON response of type `T`, or `null` if the request fails or the response is not valid JSON.
    */
-  async request(method, endpoint, body, headers) {
-    const url = `${this.baseUrl}${endpoint}`;
+  async Request(method, endpoint, headers = {}, body) {
+    if (!this.BaseURL) {
+      return null;
+    }
+    const url = this.BaseURL + endpoint;
+    const options = {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers
+      }
+    };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
     try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": _NetworkManager.DEFAULT_CONTENT_TYPE,
-          ...headers
-        },
-        body: body ? JSON.stringify(body) : void 0,
-        credentials: _NetworkManager.CREDENTIALS_MODE
-      });
+      const response = await fetch(url, options);
       if (!response.ok) {
-        await this.handleErrorResponse(response, url, method);
         return null;
       }
-      return await this.parseResponse(response, url);
-    } catch (error) {
-      this.logRequestError(error, url, method);
+      try {
+        return await response.json();
+      } catch {
+        return null;
+      }
+    } catch {
       return null;
     }
   }
-  /**
-   * Handles error responses and logs appropriate error messages.
-   * 
-   * @param {Response} response - The failed response object
-   * @param {string} url - The request URL
-   * @param {string} method - The HTTP method used
-   */
-  async handleErrorResponse(response, url, method) {
-    try {
-      const errorText = await response.text();
-      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText}`;
-      Logger.error(errorMessage, errorText ? `- ${errorText}` : "");
-    } catch (parseError) {
-      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText} - Could not parse error response`;
-      Logger.error(errorMessage);
-    }
+};
+
+// src/managers/classes/UpdateChecker.ts
+var import_path4 = __toESM(require("path"));
+var UpdateChecker = class {
+  static {
+    /**
+     * A static instance of {@link NetworkManager} configured to interact with the NPM registry
+     * for the `@tryforge/forgescript` package.
+     */
+    this.Network = new NetworkManager("https://registry.npmjs.org/@tryforge/forgescript");
   }
   /**
-   * Parses the response based on content type.
-   * 
-   * @param {Response} response - The response object
-   * @param {string} url - The request URL for logging
-   * @returns {Promise<T | null>} Parsed response data or null
+   * Retrieves the local version of the application by reading the `version` field
+   * from the nearest `package.json` file relative to the current directory.
+   *
+   * @returns A promise that resolves to the version string from `package.json`.
    */
-  async parseResponse(response, url) {
-    const contentType = response.headers.get("Content-Type");
-    if (!contentType || !contentType.includes(_NetworkManager.DEFAULT_CONTENT_TYPE)) {
-      Logger.warn(`Unexpected response format from ${url}. Content-Type: ${contentType}`);
-      return null;
-    }
-    try {
-      return await response.json();
-    } catch (parseError) {
-      Logger.error(`Failed to parse JSON response from ${url}: ${parseError.message}`);
-      return null;
-    }
+  static async LocalVersion() {
+    return (await FileSystem.ReadJSON(import_path4.default.resolve(__dirname, "../../../package.json"))).version;
   }
   /**
-   * Logs request errors with context.
-   * 
-   * @param {Error} error - The error object
-   * @param {string} url - The request URL
-   * @param {string} method - The HTTP method used
+   * Retrieves the latest version string from the network.
+   *
+   * @returns A promise that resolves to the latest version as a string if available, or `null` if not found.
+   * @throws May throw if the network request fails.
    */
-  logRequestError(error, url, method) {
-    Logger.error(`Request failed [${method} ${url}]: ${error.message}`);
+  static async LatestVersion() {
+    const response = await this.Network.Get("/latest");
+    if (typeof response === "object" && response !== null && "version" in response) {
+      return response.version;
+    }
+    return null;
+  }
+  /**
+   * Fetches and compares the local and latest available versions.
+   *
+   * @returns {Promise<CheckedVersion>} An object containing the current version, the latest version, and a boolean indicating if an update is available.
+   */
+  static async FetchVersion() {
+    const currentVersion = await this.LocalVersion();
+    const latestVersion = await this.LatestVersion();
+    return {
+      currentVersion,
+      latestVersion,
+      updateAvailable: currentVersion !== latestVersion
+    };
+  }
+  /**
+   * Checks if an update is available for the application.
+   *
+   * @returns A promise that resolves to `true` if an update is available, otherwise `false`.
+   */
+  static async UpdateAvailable() {
+    return (await this.FetchVersion()).updateAvailable;
   }
 };
 
@@ -817,6 +1069,11 @@ var Version = new import_commander2.Command("version").description("Returns the 
   } catch (err) {
     spinner.stop();
     console.error(`${import_chalk4.default.red("[ERROR]")} ${err.message}`);
+  }
+  try {
+    throw new Error("Something went wrong!");
+  } catch (err) {
+    ErrorManager.Handle(err, false, "test");
   }
 });
 
