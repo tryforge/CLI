@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
-import ora from 'ora';
+import { ProgressManager } from '../../managers';
 import { version as currentVersion, name as packageName } from '../../../package.json';
 import type { ICommandMetadata, IFileMetadata } from '../../structure';
 
@@ -22,14 +22,15 @@ export const Version: Command = new Command('version')
   .action(async () => {
     console.log(`Current version: ${chalk.cyan(currentVersion)}\n`);
 
-    const spinner = ora('Checking for updates...').start();
+    const spinner = new ProgressManager();
+    spinner.Start('Checking for new version...');
 
     try {
       const response = await fetch(`https://registry.npmjs.org/@tryforge/cli`);
       const data = await response.json();
       const latestVersion = data['dist-tags'].latest;
 
-      spinner.stop();
+      spinner.Stop();
 
       if (latestVersion !== currentVersion) {
         console.log(
@@ -40,7 +41,7 @@ export const Version: Command = new Command('version')
         console.log(chalk.green('You are using the latest version.\n'));
       }
     } catch (err) {
-      spinner.stop();
+      spinner.Stop();
       console.error(`${chalk.red('[ERROR]')} ${(err as Error).message}`);
     }
   });
