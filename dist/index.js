@@ -818,6 +818,132 @@ var ProgressManager = class {
   }
 };
 
+// src/managers/classes/PromptManager.ts
+var import_enquirer = require("enquirer");
+var PromptManager = class {
+  /**
+   * Prompts the user for a string input.
+   * @param message The message/question to display.
+   * @param initial Optional default value.
+   * @param validate Optional validation function.
+   * @returns Promise resolving to the user's input.
+   */
+  static async input(message, initial, validate) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "input",
+      name: "input",
+      message,
+      initial,
+      validate
+    });
+    return response.input;
+  }
+  /**
+   * Prompts the user to select one option from a list.
+   * @param message The message/question to display.
+   * @param choices Array of choices.
+   * @param initial Optional default index or value.
+   * @returns Promise resolving to the selected value.
+   */
+  static async select(message, choices, initial) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "select",
+      name: "select",
+      message,
+      choices,
+      initial
+    });
+    return response.select;
+  }
+  /**
+   * Prompts the user for a yes/no confirmation.
+   * @param message The message/question to display.
+   * @param initial Optional default value (true/false).
+   * @returns Promise resolving to true or false.
+   */
+  static async confirm(message, initial) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "confirm",
+      name: "confirm",
+      message,
+      initial
+    });
+    return response.confirm;
+  }
+  /**
+   * Prompts the user to select multiple options from a list.
+   * @param message The message/question to display.
+   * @param choices Array of choices.
+   * @param initial Optional array of default selected values.
+   * @returns Promise resolving to an array of selected values.
+   */
+  static async multiselect(message, choices, initial) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "multiselect",
+      name: "multiselect",
+      message,
+      choices,
+      initial
+    });
+    return response.multiselect;
+  }
+  /**
+   * Prompts the user for a password (input hidden).
+   * @param message The message/question to display.
+   * @param validate Optional validation function.
+   * @returns Promise resolving to the entered password.
+   */
+  static async password(message, validate) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "password",
+      name: "password",
+      message,
+      validate
+    });
+    return response.password;
+  }
+  /**
+   * Prompts the user with an autocomplete input.
+   * @param message The message/question to display.
+   * @param choices Array of choices.
+   * @param initial Optional default value.
+   * @returns Promise resolving to the selected value.
+   */
+  static async autocomplete(message, choices, initial) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "autocomplete",
+      name: "autocomplete",
+      message,
+      choices,
+      initial
+    });
+    return response.autocomplete;
+  }
+  /**
+   * Prompts the user with a form.
+   * @param message The message/question to display.
+   * @param choices Array of field definitions.
+   * @returns Promise resolving to an object with the form answers.
+   */
+  static async form(message, choices) {
+    const response = await (0, import_enquirer.prompt)({
+      type: "form",
+      name: "form",
+      message,
+      choices
+    });
+    return response.form;
+  }
+  /**
+   * Runs a batch of prompts and returns all answers as an object.
+   * @param prompts Array of Enquirer-style prompt configs.
+   * @returns Promise resolving to an object with answers.
+   */
+  static async promptAll(prompts) {
+    return await (0, import_enquirer.prompt)(prompts);
+  }
+};
+
 // src/managers/classes/UpdateChecker.ts
 var import_path4 = __toESM(require("path"));
 var UpdateChecker = class {
@@ -1108,6 +1234,8 @@ var import_commander2 = require("commander");
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk4.default.cyan(version)}
 `);
+  const name2 = await PromptManager.input("What is your name?");
+  console.log("Name:", name2);
   const spinner = new ProgressManager();
   spinner.Start("Checking for new version...");
   try {
