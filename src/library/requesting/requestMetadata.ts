@@ -6,8 +6,7 @@ import type {
   TSearchType, 
   TRequestResult, 
   IFunctionMetadata, 
-  IFileMetadata, 
-  IFunction 
+  IFileMetadata
 } from '../../structure';
 
 const ONE_HOUR_MS: number = 60 * 60 * 1000;
