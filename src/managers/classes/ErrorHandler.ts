@@ -95,7 +95,7 @@ export class ErrorManager implements ErrorScheme {
     const logPath = path.join(FileSystem.GetWorkspaceDirectory(), '.forge', this.LogFile);
     const logEntry = `[${new Date().toISOString()}] ${this.FormatError(error, context)}\n`;
     return FileSystem.AppendToFile(logPath, logEntry);
-  }
+  };
   
   /**
    * Formats an error message with optional context and stack trace.
@@ -114,7 +114,7 @@ export class ErrorManager implements ErrorScheme {
       msg += `\nStack: ${error.stack}`;
     }
     return msg;
-  }
+  };
 
   /**
    * Handles an error by optionally logging it and notifying the user.
@@ -131,7 +131,7 @@ export class ErrorManager implements ErrorScheme {
   ): Promise<void> {
     log ? await this.LogError(error, context) : () => {};
     this.NotifyUser(error, context);
-  }
+  };
   
   /**
    * Clears the contents of the error log file.
@@ -144,7 +144,7 @@ export class ErrorManager implements ErrorScheme {
   ): Promise<boolean> {
     const pathToLog = logPath || path.join(FileSystem.GetWorkspaceDirectory(), this.LogFile);
     return FileSystem.WriteFile(pathToLog, '');
-  }
+  };
 
   /**
    * Logs a formatted error message to the console for user notification.
@@ -157,5 +157,5 @@ export class ErrorManager implements ErrorScheme {
     context?: string
   ): void {
     console.error(this.FormatError(error, context));
-  }
+  };
 }
