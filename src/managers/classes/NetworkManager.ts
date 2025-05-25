@@ -1,224 +1,212 @@
-// 3. Local modules
-import { Logger } from './Logger';
-
 /**
- * An abstract scheme class representing the NetworkManager class.
+ * An interface representing the NetworkManager class.
  */
-abstract class NetworkScheme {
-  abstract baseUrl: string;
+interface NetworkScheme {
+  /**
+   * The base URL to work with.
+   */
+  BaseURL?: string;
 
-  abstract get<T>(
+  /**
+   * Sends a GET request to the specified endpoint and returns the response data.
+   *
+   * @typeParam T - The expected response data type.
+   * @param endpoint - The API endpoint to send the GET request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response data of type `T`, or `null` if the request fails.
+   */
+  Get?<T>(
     endpoint: string,
-    headers?: Record<string, string>
-  ): Promise<T | null>;
+    headers: Record<string, string>
+  ): Promise<T | null>
 
-  abstract post<T>(
+  /**
+   * Sends a POST request to the specified endpoint with the provided body and headers.
+   *
+   * @template T - The expected response type.
+   * @param endpoint - The API endpoint to send the request to.
+   * @param body - The request payload to be sent in the body of the POST request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
+   */
+  Post?<T>(
     endpoint: string,
     body: object,
     headers?: Record<string, string>
   ): Promise<T | null>;
 
-  abstract delete<T>(
-    endpoint: string,
-    headers?: Record<string, string>
-  ): Promise<T | null>;
-
-  abstract put<T>(
+  /**
+   * Sends an HTTP PUT request to the specified endpoint with the provided body and headers.
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the PUT request to.
+   * @param body - The request payload to be sent in the body of the PUT request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
+   */
+  Put?<T>(
     endpoint: string,
     body: object,
     headers?: Record<string, string>
   ): Promise<T | null>;
 
-  abstract request<T>(
+  /**
+   * Sends a DELETE request to the specified endpoint.
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the DELETE request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
+   */
+  Delete?<T>(
+    endpoint: string,
+    headers?: Record<string, string>
+  ): Promise<T | null>;
+
+  /**
+   * Sends an HTTP request to the specified endpoint using the given method, body, and headers.
+   *
+   * @template T - The expected response type.
+   * @param method - The HTTP method to use (e.g., 'GET', 'POST', 'PUT', 'DELETE').
+   * @param endpoint - The endpoint path to append to the base URL.
+   * @param body - Optional request payload to send as JSON.
+   * @param headers - Optional additional headers to include in the request.
+   * @returns A promise that resolves to the parsed JSON response of type `T`, or `null` if the request fails or the response is not valid JSON.
+   */
+  Request?<T>(
     method: string,
     endpoint: string,
-    body?: object,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    body?: object
   ): Promise<T | null>;
 }
-
 /**
- * A class to easily manage network-related operations.
+ * A class to manage HTTP-related operations.
  */
-export class NetworkManager extends NetworkScheme {
-  private static readonly DEFAULT_CONTENT_TYPE = 'application/json';
-  private static readonly CREDENTIALS_MODE = 'include';
+export class NetworkManager implements NetworkScheme {
+  /**
+   * The base URL to work with.
+   */
+  public BaseURL?: string;
 
   /**
-   * The base URL to work with, in the instance.
+   * The constructor to create the instance of the class.
+   * @param baseUrl The base URL to work with.
    */
-  public baseUrl: string;
-
   constructor(baseUrl: string) {
-    super();
-    this.baseUrl = baseUrl;
+    this.BaseURL = baseUrl;
   }
 
   /**
-   * Sends a GET request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const users = await NetworkManager.get<User[]>('/users');
+   * Sends a GET request to the specified endpoint and returns the response data.
+   *
+   * @typeParam T - The expected response data type.
+   * @param endpoint - The API endpoint to send the GET request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response data of type `T`, or `null` if the request fails.
    */
-  public async get<T>(
+  public async Get<T>(
     endpoint: string,
-    headers?: Record<string, string>
+    headers: Record<string, string> = {}
   ): Promise<T | null> {
-    return this.request<T>('GET', endpoint, undefined, headers);
+    return this.Request<T>('GET', endpoint, undefined, headers);
   }
 
   /**
-   * Sends a POST request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {object} body - The request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const newUser = await NetworkManager.post<User>('/users', { name: 'John', email: 'john@example.com' });
+   * Sends a POST request to the specified endpoint with the provided body and headers.
+   *
+   * @template T - The expected response type.
+   * @param endpoint - The API endpoint to send the request to.
+   * @param body - The request payload to be sent in the body of the POST request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async post<T>(
+  public async Post<T>(
     endpoint: string,
     body: object,
-    headers?: Record<string, string>
+    headers: Record<string, string> = {}
   ): Promise<T | null> {
-    return this.request<T>('POST', endpoint, body, headers);
+    return this.Request<T>('POST', endpoint, headers, body);
   }
 
   /**
-   * Sends a PUT request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {object} body - The request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const updatedUser = await NetworkManager.put<User>('/users/123', { name: 'Jane Doe' });
+   * Sends an HTTP PUT request to the specified endpoint with the provided body and headers.
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the PUT request to.
+   * @param body - The request payload to be sent in the body of the PUT request.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async put<T>(
+  public async Put<T>(
     endpoint: string,
     body: object,
-    headers?: Record<string, string>
+    headers: Record<string, string> = {}
   ): Promise<T | null> {
-    return this.request<T>('PUT', endpoint, body, headers);
+    return this.Request<T>('PUT', endpoint, headers, body);
   }
 
   /**
    * Sends a DELETE request to the specified endpoint.
-   * 
-   * @param {string} endpoint - The API endpoint
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
-   * 
-   * @example
-   * const success = await NetworkManager.delete<{ success: boolean }>('/users/123');
+   *
+   * @typeParam T - The expected response type.
+   * @param endpoint - The API endpoint to send the DELETE request to.
+   * @param headers - Optional HTTP headers to include in the request.
+   * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async delete<T>(
+  public async Delete<T>(
     endpoint: string,
-    headers?: Record<string, string>
+    headers: Record<string, string> = {}
   ): Promise<T | null> {
-    return this.request<T>('DELETE', endpoint, undefined, headers);
+    return this.Request<T>('DELETE', endpoint, undefined, headers);
   }
 
   /**
-   * Centralized request handling with enhanced error handling.
-   * 
-   * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
-   * @param {string} endpoint - API endpoint
-   * @param {object} [body] - Optional request payload
-   * @param {Record<string, string>} [headers] - Optional headers for the request
-   * @returns {Promise<T | null>} The response data or null in case of failure
+   * Sends an HTTP request to the specified endpoint using the given method, body, and headers.
+   *
+   * @template T - The expected response type.
+   * @param method - The HTTP method to use (e.g., 'GET', 'POST', 'PUT', 'DELETE').
+   * @param endpoint - The endpoint path to append to the base URL.
+   * @param body - Optional request payload to send as JSON.
+   * @param headers - Optional additional headers to include in the request.
+   * @returns A promise that resolves to the parsed JSON response of type `T`, or `null` if the request fails or the response is not valid JSON.
    */
-  public async request<T>(
+  public async Request<T>(
     method: string,
     endpoint: string,
-    body?: object,
-    headers?: Record<string, string>
+    headers: Record<string, string> = {},
+    body?: object
   ): Promise<T | null> {
-    const url = `${this.baseUrl}${endpoint}`;
-    
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': NetworkManager.DEFAULT_CONTENT_TYPE,
-          ...headers
-        },
-        body: body ? JSON.stringify(body) : undefined,
-        credentials: NetworkManager.CREDENTIALS_MODE
-      });
+    if (!this.BaseURL) {
+      return null;
+    }
 
+    const url = this.BaseURL + endpoint;
+    const options: RequestInit = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      }
+    };
+
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    try {
+      const response = await fetch(url, options);
       if (!response.ok) {
-        await this.handleErrorResponse(response, url, method);
         return null;
       }
 
-      return await this.parseResponse<T>(response, url);
-    } catch (error) {
-      this.logRequestError(error as Error, url, method);
+      try {
+        return (await response.json()) as T;
+      } catch {
+        return null;
+      }
+    } catch {
       return null;
     }
-  }
-
-  /**
-   * Handles error responses and logs appropriate error messages.
-   * 
-   * @param {Response} response - The failed response object
-   * @param {string} url - The request URL
-   * @param {string} method - The HTTP method used
-   */
-  private async handleErrorResponse(
-    response: Response,
-    url: string,
-    method: string
-  ): Promise<void> {
-    try {
-      const errorText = await response.text();
-      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText}`;
-      Logger.error(errorMessage, errorText ? `- ${errorText}` : '');
-    } catch (parseError) {
-      const errorMessage = `Network error [${method} ${url}]: ${response.status} ${response.statusText} - Could not parse error response`;
-      Logger.error(errorMessage);
-    }
-  }
-
-  /**
-   * Parses the response based on content type.
-   * 
-   * @param {Response} response - The response object
-   * @param {string} url - The request URL for logging
-   * @returns {Promise<T | null>} Parsed response data or null
-   */
-  private async parseResponse<T>(response: Response, url: string): Promise<T | null> {
-    const contentType = response.headers.get('Content-Type');
-    
-    if (!contentType || !contentType.includes(NetworkManager.DEFAULT_CONTENT_TYPE)) {
-      Logger.warn(`Unexpected response format from ${url}. Content-Type: ${contentType}`);
-      return null;
-    }
-
-    try {
-      return await response.json();
-    } catch (parseError) {
-      Logger.error(`Failed to parse JSON response from ${url}: ${(parseError as Error).message}`);
-      return null;
-    }
-  }
-
-  /**
-   * Logs request errors with context.
-   * 
-   * @param {Error} error - The error object
-   * @param {string} url - The request URL
-   * @param {string} method - The HTTP method used
-   */
-  private logRequestError(error: Error, url: string, method: string): void {
-    Logger.error(`Request failed [${method} ${url}]: ${error.message}`);
   }
 }
