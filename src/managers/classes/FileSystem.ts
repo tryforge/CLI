@@ -5,7 +5,7 @@ import path from 'path';
 import { Stats } from 'fs';
 
 /**
- * An abstract class representing the FileSystem class.
+ * An interface representing the FileSystem class.
  */
 interface FileScheme {
   /**
@@ -218,6 +218,13 @@ interface FileScheme {
   GetTempDirectory?(): string;
 
   /**
+   * Returns the current working directory of the Node.js process.
+   *
+   * @returns {string} The absolute path of the current workspace directory.
+   */
+  GetWorkspaceDirectory?(): string;
+
+  /**
    * Lists the contents of a directory at the given path.
    * @param path - The path to the directory.
    * @returns A promise that resolves to an array of file and directory names.
@@ -341,7 +348,7 @@ export class FileSystem implements FileScheme {
    * Reads a JSON file from the specified path and parses its contents.
    *
    * @param path - The file system path to the JSON file.
-   * @returns A promise that resolves to the parsed JSON object if successful, or `false` if an error occurs (e.g., file not found or invalid JSON).
+   * @returns A promise that resolves to the parsed JSON object if successful, or `null` if an error occurs (e.g., file not found or invalid JSON).
    */
   public static async ReadJSON(
     path: string
@@ -572,6 +579,15 @@ export class FileSystem implements FileScheme {
   public static GetTempDirectory(): string {
     return os.tmpdir()
   };
+
+  /**
+   * Returns the current working directory of the Node.js process.
+   *
+   * @returns {string} The absolute path of the current workspace directory.
+   */
+  public static GetWorkspaceDirectory(): string {
+    return process.cwd();
+  }
 
   /**
    * Lists the contents of a directory at the given path.
