@@ -25,7 +25,7 @@ interface CacheMetadata {
 }
 
 /**
- * An interface representing the CacheManager class.
+ * An interface representing how the CacheManager class is structured.
  */
 interface CacheScheme {
   /**
