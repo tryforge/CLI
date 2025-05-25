@@ -1,7 +1,4 @@
-// 1. Node.js built-ins
-import fs from 'fs';
-
-// 2. External packages
+// External packages
 import chalk from 'chalk';
 
 /**
@@ -19,193 +16,184 @@ enum LogLevel {
 }
 
 /**
- * An interface representing the configuration for the logger.
+ * An interface representing how the Logger class is structured.
  */
-interface LoggerConfig {
-  level?: LogLevel;
-  console?: boolean;
-  file?: string;
-  scope?: string;
+interface LoggerScheme {
+  /**
+   * Logs a message at the specified log level.
+   * @param level The log level.
+   * @param args The message arguments.
+   */
+  log?(
+    level: LogLevel,
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs a trace message.
+   * @param args The message arguments.
+   */
+  trace?(
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs a debug message.
+   * @param args The message arguments.
+   */
+  debug?(
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs an info message.
+   * @param args The message arguments.
+   */
+  info?(
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs a success message.
+   * @param args The message arguments.
+   */
+  success?(
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs a warning message.
+   * @param args The message arguments.
+   */
+  warn?(
+    ...args: string[]
+  ): void;
+
+  /**
+   * Logs an error message.
+   * @param args The message arguments.
+   */
+  error?(
+    ...args: string[]
+  ): void;
+  
+  /**
+   * Logs a fatal error message.
+   * @param args The message arguments.
+   */
+  fatal?(
+    ...args: string[]
+  ): void;
+
 }
 
 /**
- * A class to manage console outputs.
+ * Logger class for logging messages at various log levels.
  */
-export class Logger {
-  private static level: LogLevel = LogLevel.INFO;
-  private static writeToConsole: boolean = true;
-  private static filePath?: string;
-  private static defaultScope?: string;
+export class Logger implements LoggerScheme {
+  private static currentLevel: LogLevel = LogLevel.INFO;
 
-  public static configure(
-    config: LoggerConfig = {}
-  ): void {
-    Logger.level = config.level ?? LogLevel.INFO;
-    Logger.writeToConsole = config.console ?? true;
-    Logger.filePath = config.file;
-    Logger.defaultScope = config.scope;
+  /**
+   * Sets the current log level.
+   * @param level The log level to set.
+   */
+  public static setLevel(level: LogLevel): void {
+    Logger.currentLevel = level;
   }
 
   /**
-   * Main log handler method, manages and format the output.
-   * @param level - The type of log to log.
-   * @param message - The message to log.
-   * @param scope - The custom scope to use.
-   * @returns void
+   * Logs a message at the specified log level.
+   * @param level The log level.
+   * @param args The message arguments.
    */
-  private static log(
-    level: LogLevel,
-    message: any,
-    scope?: string
-  ): void {
-    if (level < Logger.level) return;
-
-    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    const levelName = LogLevel[level].toUpperCase();
-    const finalScope = scope || Logger.defaultScope;
-
-    const parts = [
-      `[${timestamp}]`,
-      `[${levelName}]`,
-      finalScope ? `[${finalScope}]` : '',
-      message
-    ].filter(Boolean).join(' ');
-
-    const colorizedMessage = Logger.colorize(level, parts);
-
-    if (Logger.writeToConsole) {
-      if ([LogLevel.ERROR, LogLevel.FATAL].includes(level)) console.error(colorizedMessage);
-      else if (level === LogLevel.WARN) console.warn(colorizedMessage);
-      else console.log(colorizedMessage);
-    }
-
-    if (Logger.filePath) {
-      try {
-        fs.appendFileSync(Logger.filePath, parts + '\n', 'utf-8');
-      } catch (error) {
-        console.error(`Failed to write log to file: ${(error as Error).message}`);
-      }
-    }
-  }
-
-  /**
-   * Manages the colorization for each type.
-   * @param level - The type of log to colorize.
-   * @param message - The message that will be colorized.
-   * @returns `message`
-   */
-  private static colorize(
-    level: LogLevel,
-    message: string
-  ): string {
+  public static log(level: LogLevel, ...args: string[]): void {
+    if (level < Logger.currentLevel) return;
+    const prefix = LogLevel[level];
+    
     switch (level) {
-      case LogLevel.TRACE:
-        return chalk.gray(message);
+      case (LogLevel.TRACE):
+        args.forEach(arg => console.log(`${chalk.gray(prefix)} ${chalk.gray(arg)}`))
+        break
 
-      case LogLevel.DEBUG:
-        return chalk.blue(message);
+      case (LogLevel.DEBUG):
+        args.forEach(arg => console.log(`${chalk.yellow(prefix)} ${chalk.yellow(arg)}`))
+        break
 
-      case LogLevel.INFO:
-        return chalk.cyan(message);
+      case (LogLevel.INFO):
+        args.forEach(arg => console.log(`${chalk.blue(prefix)} ${chalk.blue(arg)}`))
+        break
 
-      case LogLevel.SUCCESS:
-        return chalk.green(message);
+      case (LogLevel.SUCCESS):
+        args.forEach(arg => console.log(`${chalk.green(prefix)} ${chalk.green(arg)}`))
+        break
 
-      case LogLevel.WARN:
-        return chalk.yellow(message);
+      case (LogLevel.WARN):
+        args.forEach(arg => console.log(`${chalk.yellow(prefix)} ${chalk.yellow(arg)}`))
+        break
 
-      case LogLevel.ERROR:
-        return chalk.red(message);
+      case (LogLevel.ERROR):
+        args.forEach(arg => console.log(`${chalk.red(prefix)} ${chalk.red(arg)}`))
+        break
 
-      case LogLevel.FATAL:
-        return chalk.bgRed.white(message);
-
-      default:
-        return message;
+      case (LogLevel.FATAL):
+        args.forEach(arg => console.log(`${chalk.red(prefix)} ${chalk.red(arg)}`))
+        break
     }
   }
 
   /**
-   * Handles logs with type: TRACE.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a trace message.
+   * @param args The message arguments.
    */
-  public static trace(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.TRACE, message, scope);
+  public trace(...args: string[]): void {
+    Logger.log(LogLevel.TRACE, ...args);
   }
 
   /**
-   * Handles logs with type: DEBUG.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a debug message.
+   * @param args The message arguments.
    */
-  public static debug(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.DEBUG, message, scope);
+  public debug(...args: string[]): void {
+    Logger.log(LogLevel.DEBUG, ...args);
   }
 
   /**
-   * Handles logs with type: INFO.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs an info message.
+   * @param args The message arguments.
    */
-  public static info(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.INFO, message, scope);
+  public info(...args: string[]): void {
+    Logger.log(LogLevel.INFO, ...args);
   }
 
   /**
-   * Handles logs with type: SUCCESS.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a success message.
+   * @param args The message arguments.
    */
-  public static success(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.SUCCESS, message, scope);
+  public success(...args: string[]): void {
+    Logger.log(LogLevel.SUCCESS, ...args);
   }
 
   /**
-   * Handles logs with type: ERROR.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a warning message.
+   * @param args The message arguments.
    */
-  public static warn(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.WARN, message, scope);
+  public warn(...args: string[]): void {
+    Logger.log(LogLevel.WARN, ...args);
   }
 
   /**
-   * Handles logs with type: ERROR.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs an error message.
+   * @param args The message arguments.
    */
-  public static error(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.ERROR, message, scope);
+  public error(...args: string[]): void {
+    Logger.log(LogLevel.ERROR, ...args);
   }
 
   /**
-   * Handles logs with type: FATAL.
-   * @param message - The message to output.
-   * @param scope - The debug scope to use.
+   * Logs a fatal error message.
+   * @param args The message arguments.
    */
-  public static fatal(
-    message: any,
-    scope?: string
-  ): void {
-    Logger.log(LogLevel.FATAL, message, scope);
+  public fatal(...args: string[]): void {
+    Logger.log(LogLevel.FATAL, ...args);
   }
 }
