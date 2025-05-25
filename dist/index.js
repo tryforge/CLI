@@ -61,9 +61,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the file.
    * @returns A promise that resolves to the file contents as a string or Buffer.
    */
-  static async ReadFile(path5) {
+  static async ReadFile(path6) {
     try {
-      return await import_promises.default.readFile(path5, "utf-8");
+      return await import_promises.default.readFile(path6, "utf-8");
     } catch (error) {
       if (error instanceof Error) {
         return error.message;
@@ -78,9 +78,9 @@ var FileSystem = class _FileSystem {
    * @param data - The data to write to the file.
    * @returns A promise that resolves to true if the write was successful, false otherwise.
    */
-  static async WriteFile(path5, data) {
+  static async WriteFile(path6, data) {
     try {
-      await import_promises.default.writeFile(path5, data, "utf-8");
+      await import_promises.default.writeFile(path6, data, "utf-8");
       return true;
     } catch {
       return false;
@@ -119,9 +119,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the file.
    * @returns A promise that resolves to true if the file exists, false otherwise.
    */
-  static async FileExists(path5) {
+  static async FileExists(path6) {
     try {
-      await import_promises.default.access(path5);
+      await import_promises.default.access(path6);
       return true;
     } catch {
       return false;
@@ -133,9 +133,9 @@ var FileSystem = class _FileSystem {
    * @param path - The file system path to the JSON file.
    * @returns A promise that resolves to the parsed JSON object if successful, or `null` if an error occurs (e.g., file not found or invalid JSON).
    */
-  static async ReadJSON(path5) {
+  static async ReadJSON(path6) {
     try {
-      return JSON.parse(await _FileSystem.ReadFile(path5));
+      return JSON.parse(await _FileSystem.ReadFile(path6));
     } catch {
       return null;
     }
@@ -146,9 +146,9 @@ var FileSystem = class _FileSystem {
    * @param object - The object to serialize and write as JSON.
    * @returns A promise that resolves to true if the write was successful, false otherwise.
    */
-  static async WriteJSON(path5, object) {
+  static async WriteJSON(path6, object) {
     try {
-      await import_promises.default.writeFile(path5, JSON.stringify(object), "utf-8");
+      await import_promises.default.writeFile(path6, JSON.stringify(object), "utf-8");
       return true;
     } catch {
       return false;
@@ -164,9 +164,9 @@ var FileSystem = class _FileSystem {
    * @param data - The content to write to the file. Defaults to an empty string.
    * @returns A promise that resolves to `true` if the file was created successfully, or `false` if an error occurred (e.g., file already exists).
    */
-  static async CreateFile(path5, data = "") {
+  static async CreateFile(path6, data = "") {
     try {
-      await import_promises.default.writeFile(path5, data, { flag: "wx" });
+      await import_promises.default.writeFile(path6, data, { flag: "wx" });
       return true;
     } catch {
       return false;
@@ -179,9 +179,9 @@ var FileSystem = class _FileSystem {
    * @param recursive - Whether to create parent directories if they do not exist. Defaults to `true`.
    * @returns A promise that resolves to `true` if the directory was created successfully, or `false` if an error occurred.
    */
-  static async CreateDirectory(path5, recursive = true) {
+  static async CreateDirectory(path6, recursive = true) {
     try {
-      await import_promises.default.mkdir(path5, { recursive });
+      await import_promises.default.mkdir(path6, { recursive });
       return true;
     } catch {
       return false;
@@ -193,9 +193,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the file to be deleted.
    * @returns A promise that resolves to `true` if the file was successfully deleted, or `false` if an error occurred.
    */
-  static async DeleteFile(path5) {
+  static async DeleteFile(path6) {
     try {
-      await import_promises.default.unlink(path5);
+      await import_promises.default.unlink(path6);
       return true;
     } catch {
       return false;
@@ -208,9 +208,9 @@ var FileSystem = class _FileSystem {
    * @param recursive - Whether to delete directories recursively.
    * @returns A promise that resolves to `true` if the directory was deleted successfully, or `false` if an error occurred.
    */
-  static async DeleteDirectory(path5, recursive) {
+  static async DeleteDirectory(path6, recursive) {
     try {
-      await import_promises.default.rmdir(path5, { recursive });
+      await import_promises.default.rmdir(path6, { recursive });
       return true;
     } catch {
       return false;
@@ -226,9 +226,9 @@ var FileSystem = class _FileSystem {
    * @param data - The data to append to the file, as a string or Buffer.
    * @returns A promise that resolves to `true` if the append operation was successful, or `false` otherwise.
    */
-  static async AppendToFile(path5, data) {
+  static async AppendToFile(path6, data) {
     try {
-      await import_promises.default.appendFile(path5, data);
+      await import_promises.default.appendFile(path6, data);
       return true;
     } catch {
       return false;
@@ -240,9 +240,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the file to be read.
    * @returns A Promise that resolves to a Buffer containing the file's contents, or `null` if the file cannot be read.
    */
-  static async ReadFileBuffer(path5) {
+  static async ReadFileBuffer(path6) {
     try {
-      return await import_promises.default.readFile(path5);
+      return await import_promises.default.readFile(path6);
     } catch {
       return null;
     }
@@ -280,9 +280,9 @@ var FileSystem = class _FileSystem {
    * @param path - The file system path to check.
    * @returns A promise that resolves to `true` if the path is a directory, or `false` otherwise.
    */
-  static async IsDirectory(path5) {
+  static async IsDirectory(path6) {
     try {
-      return (await import_promises.default.stat(path5)).isDirectory();
+      return (await import_promises.default.stat(path6)).isDirectory();
     } catch {
       return false;
     }
@@ -293,9 +293,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to check.
    * @returns A promise that resolves to `true` if the path is a file, or `false` otherwise.
    */
-  static async IsFile(path5) {
+  static async IsFile(path6) {
     try {
-      return (await import_promises.default.stat(path5)).isFile();
+      return (await import_promises.default.stat(path6)).isFile();
     } catch {
       return false;
     }
@@ -329,9 +329,9 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the directory.
    * @returns A promise that resolves to an array of file and directory names.
    */
-  static async ListDirectory(path5) {
+  static async ListDirectory(path6) {
     try {
-      return await import_promises.default.readdir(path5);
+      return await import_promises.default.readdir(path6);
     } catch {
       return false;
     }
@@ -340,9 +340,9 @@ var FileSystem = class _FileSystem {
    * Retrieves file statistics for the file at the given path.
    * @returns A promise that resolves to the file statistics (fs.Stats).
    */
-  static async GetFileStats(path5) {
+  static async GetFileStats(path6) {
     try {
-      return await import_promises.default.stat(path5);
+      return await import_promises.default.stat(path6);
     } catch {
       return false;
     }
@@ -352,27 +352,27 @@ var FileSystem = class _FileSystem {
    * @param path - The path to the directory.
    * @returns A promise that resolves when the directory exists.
    */
-  static async EnsureDirectory(path5) {
+  static async EnsureDirectory(path6) {
     try {
-      await _FileSystem.FileExists(path5);
+      await _FileSystem.FileExists(path6);
       return {
         success: true,
         created: false,
-        path: path5
+        path: path6
       };
     } catch {
       try {
-        await _FileSystem.CreateDirectory(path5, true);
+        await _FileSystem.CreateDirectory(path6, true);
         return {
           success: true,
           created: true,
-          path: path5
+          path: path6
         };
       } catch {
         return {
           success: false,
           created: false,
-          path: path5
+          path: path6
         };
       }
     }
@@ -485,8 +485,93 @@ var CacheManager = class {
   }
 };
 
-// src/managers/classes/ErrorHandler.ts
+// src/managers/classes/ConfigurationManager.ts
 var import_path3 = __toESM(require("path"));
+var ConfigurationManager = class {
+  static {
+    this.ConfigurationPath = import_path3.default.join(FileSystem.GetHomePath(), ".forge", "config.json");
+  }
+  /**
+   * Retrieves the configuration object from the configuration file.
+   *
+   * @template T - The expected type of the configuration object.
+   * @returns A promise that resolves to the configuration object of type `T` if the configuration file exists,
+   *          or `null` if the file does not exist.
+   */
+  static async GetConfiguration() {
+    if (!await FileSystem.FileExists(this.ConfigurationPath)) return null;
+    return await FileSystem.ReadJSON(this.ConfigurationPath);
+  }
+  /**
+   * Asynchronously sets the configuration by writing the provided key-value pairs to a JSON file
+   * at the specified configuration path.
+   *
+   * @param config - An object containing configuration key-value pairs to be saved.
+   * @returns A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
+   */
+  static async SetConfiguration(config) {
+    return await FileSystem.WriteJSON(this.ConfigurationPath, config);
+  }
+  /**
+   * Sets a configuration key to the specified value and persists the updated configuration to disk.
+   *
+   * @template T - The type of the value to set for the configuration key.
+   * @param {string} key - The configuration key to set.
+   * @param {T} value - The value to assign to the configuration key.
+   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
+   */
+  static async SetConfigurationKey(key, value) {
+    let configuration = await this.GetConfiguration() || {};
+    configuration[key] = value;
+    return await FileSystem.WriteJSON(this.ConfigurationPath, configuration);
+  }
+  /**
+   * Deletes the configuration file if it exists.
+   *
+   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration file was successfully deleted,
+   * or `false` if the file does not exist or deletion failed.
+   */
+  static async DeleteConfiguration() {
+    if (!await FileSystem.FileExists(this.ConfigurationPath)) return false;
+    return await FileSystem.DeleteFile(this.ConfigurationPath);
+  }
+  /**
+   * Checks whether the configuration file exists at the specified configuration path.
+   *
+   * @returns A promise that resolves to `true` if the configuration file exists, or `false` otherwise.
+   */
+  static async ConfigurationExists() {
+    return await FileSystem.FileExists(this.ConfigurationPath);
+  }
+  /**
+   * Retrieves a specific configuration value by its key from the configuration store.
+   *
+   * @template T - The expected type of the configuration value.
+   * @param {string} key - The key of the configuration value to retrieve.
+   * @returns {Promise<T | undefined>} A promise that resolves to the value associated with the given key,
+   * or `undefined` if the key does not exist or the configuration is not available.
+   */
+  static async GetConfigurationKey(key) {
+    const configuration = await this.GetConfiguration();
+    return configuration ? configuration[key] : void 0;
+  }
+  /**
+   * Retrieves a list of configuration field names.
+   *
+   * This static asynchronous method fetches the current configuration object
+   * and returns an array containing the names of its fields (keys).
+   * If no configuration is found, it returns an empty array.
+   *
+   * @returns {Promise<string[]>} A promise that resolves to an array of configuration field names.
+   */
+  static async ListConfigurationFields() {
+    const config = await this.GetConfiguration();
+    return config ? Object.keys(config) : [];
+  }
+};
+
+// src/managers/classes/ErrorHandler.ts
+var import_path4 = __toESM(require("path"));
 var ErrorManager = class {
   static {
     /**
@@ -502,7 +587,7 @@ var ErrorManager = class {
    * @returns A promise that resolves to `true` if the log entry was successfully appended, or `false` otherwise.
    */
   static async LogError(error, context) {
-    const logPath = import_path3.default.join(FileSystem.GetWorkspaceDirectory(), ".forge", this.LogFile);
+    const logPath = import_path4.default.join(FileSystem.GetWorkspaceDirectory(), ".forge", this.LogFile);
     const logEntry = `[${(/* @__PURE__ */ new Date()).toISOString()}] ${this.FormatError(error, context)}
 `;
     return FileSystem.AppendToFile(logPath, logEntry);
@@ -543,7 +628,7 @@ Stack: ${error.stack}`;
    * @returns A promise that resolves to `true` if the log file was successfully cleared, or `false` otherwise.
    */
   static async ClearErrorLog(logPath) {
-    const pathToLog = logPath || import_path3.default.join(FileSystem.GetWorkspaceDirectory(), this.LogFile);
+    const pathToLog = logPath || import_path4.default.join(FileSystem.GetWorkspaceDirectory(), this.LogFile);
     return FileSystem.WriteFile(pathToLog, "");
   }
   /**
@@ -820,132 +905,9 @@ var ProgressManager = class {
 
 // src/managers/classes/PromptManager.ts
 var import_enquirer = require("enquirer");
-var PromptManager = class {
-  /**
-   * Prompts the user for a string input.
-   * @param message The message/question to display.
-   * @param initial Optional default value.
-   * @param validate Optional validation function.
-   * @returns Promise resolving to the user's input.
-   */
-  static async input(message, initial, validate) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "input",
-      name: "input",
-      message,
-      initial,
-      validate
-    });
-    return response.input;
-  }
-  /**
-   * Prompts the user to select one option from a list.
-   * @param message The message/question to display.
-   * @param choices Array of choices.
-   * @param initial Optional default index or value.
-   * @returns Promise resolving to the selected value.
-   */
-  static async select(message, choices, initial) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "select",
-      name: "select",
-      message,
-      choices,
-      initial
-    });
-    return response.select;
-  }
-  /**
-   * Prompts the user for a yes/no confirmation.
-   * @param message The message/question to display.
-   * @param initial Optional default value (true/false).
-   * @returns Promise resolving to true or false.
-   */
-  static async confirm(message, initial) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "confirm",
-      name: "confirm",
-      message,
-      initial
-    });
-    return response.confirm;
-  }
-  /**
-   * Prompts the user to select multiple options from a list.
-   * @param message The message/question to display.
-   * @param choices Array of choices.
-   * @param initial Optional array of default selected values.
-   * @returns Promise resolving to an array of selected values.
-   */
-  static async multiselect(message, choices, initial) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "multiselect",
-      name: "multiselect",
-      message,
-      choices,
-      initial
-    });
-    return response.multiselect;
-  }
-  /**
-   * Prompts the user for a password (input hidden).
-   * @param message The message/question to display.
-   * @param validate Optional validation function.
-   * @returns Promise resolving to the entered password.
-   */
-  static async password(message, validate) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "password",
-      name: "password",
-      message,
-      validate
-    });
-    return response.password;
-  }
-  /**
-   * Prompts the user with an autocomplete input.
-   * @param message The message/question to display.
-   * @param choices Array of choices.
-   * @param initial Optional default value.
-   * @returns Promise resolving to the selected value.
-   */
-  static async autocomplete(message, choices, initial) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "autocomplete",
-      name: "autocomplete",
-      message,
-      choices,
-      initial
-    });
-    return response.autocomplete;
-  }
-  /**
-   * Prompts the user with a form.
-   * @param message The message/question to display.
-   * @param choices Array of field definitions.
-   * @returns Promise resolving to an object with the form answers.
-   */
-  static async form(message, choices) {
-    const response = await (0, import_enquirer.prompt)({
-      type: "form",
-      name: "form",
-      message,
-      choices
-    });
-    return response.form;
-  }
-  /**
-   * Runs a batch of prompts and returns all answers as an object.
-   * @param prompts Array of Enquirer-style prompt configs.
-   * @returns Promise resolving to an object with answers.
-   */
-  static async promptAll(prompts) {
-    return await (0, import_enquirer.prompt)(prompts);
-  }
-};
 
 // src/managers/classes/UpdateChecker.ts
-var import_path4 = __toESM(require("path"));
+var import_path5 = __toESM(require("path"));
 var UpdateChecker = class {
   static {
     /**
@@ -961,7 +923,7 @@ var UpdateChecker = class {
    * @returns A promise that resolves to the version string from `package.json`.
    */
   static async LocalVersion() {
-    return (await FileSystem.ReadJSON(import_path4.default.resolve(__dirname, "../../../package.json"))).version;
+    return (await FileSystem.ReadJSON(import_path5.default.resolve(__dirname, "../../../package.json"))).version;
   }
   /**
    * Retrieves the latest version string from the network.
@@ -1234,8 +1196,6 @@ var import_commander2 = require("commander");
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk4.default.cyan(version)}
 `);
-  const name2 = await PromptManager.input("What is your name?");
-  console.log("Name:", name2);
   const spinner = new ProgressManager();
   spinner.Start("Checking for new version...");
   try {
