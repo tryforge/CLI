@@ -4,4 +4,5 @@ export * from './classes/ErrorHandler';
 export * from './classes/FileSystem';
 export * from './classes/Logger';
 export * from './classes/NetworkManager';
+export * from './classes/ProgressManager';
 export * from './classes/UpdateChecker';

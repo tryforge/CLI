@@ -42,7 +42,7 @@ var version = "0.0.1";
 
 // src/commands/search/search.ts
 var import_chalk3 = __toESM(require("chalk"));
-var import_ora = __toESM(require("ora"));
+var import_ora2 = __toESM(require("ora"));
 var import_commander = require("commander");
 
 // src/library/requesting/requestMetadata.ts
@@ -760,6 +760,64 @@ var NetworkManager = class {
   }
 };
 
+// src/managers/classes/ProgressManager.ts
+var import_ora = __toESM(require("ora"));
+var ProgressManager = class {
+  constructor() {
+    /**
+     * An instance of the Ora spinner used to display progress in the CLI.
+     * Can be `null` if the spinner has not been initialized.
+     */
+    this.Spinner = null;
+  }
+  /**
+   * Start a loading spinner with a message.
+   * @param message The message to display with the spinner.
+   */
+  Start(message) {
+    if (this.Spinner) this.Spinner.stop();
+    this.Spinner = (0, import_ora.default)({ text: message }).start();
+  }
+  /**
+   * Update the spinner text.
+   * @param message The new message to display.
+   */
+  Update(message) {
+    if (this.Spinner) {
+      this.Spinner.text = message;
+    }
+  }
+  /**
+   * Mark the spinner as succeeded with a message and stop it.
+   * @param message The success message to display.
+   */
+  Succeed(message) {
+    if (this.Spinner) {
+      this.Spinner.succeed(message);
+      this.Spinner = null;
+    }
+  }
+  /**
+   * Mark the spinner as failed with a message and stop it.
+   * @param message The failure message to display.
+   */
+  Fail(message) {
+    if (this.Spinner) {
+      this.Spinner.fail(message);
+      this.Spinner = null;
+    }
+  }
+  /**
+   * Stop the spinner without marking as success or failure.
+   */
+  Stop() {
+    if (this.Spinner) {
+      this.Spinner.stop();
+      this.Spinner = null;
+    }
+  }
+};
+
 // src/managers/classes/UpdateChecker.ts
 var import_path4 = __toESM(require("path"));
 var UpdateChecker = class {
@@ -993,7 +1051,7 @@ async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev,
 }
 var Search = new import_commander.Command("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
   const SearchType = type.toLowerCase();
-  const Spinner = (0, import_ora.default)(`Searching for ${SearchType} '${object}'...`).start();
+  const Spinner = (0, import_ora2.default)(`Searching for ${SearchType} '${object}'...`).start();
   try {
     if (!IsValidType(SearchType)) {
       Spinner.stop();
@@ -1047,16 +1105,16 @@ ${import_chalk3.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/
 // src/commands/system/version.ts
 var import_chalk4 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
-var import_ora2 = __toESM(require("ora"));
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk4.default.cyan(version)}
 `);
-  const spinner = (0, import_ora2.default)("Checking for updates...").start();
+  const spinner = new ProgressManager();
+  spinner.Start("Checking for new version...");
   try {
     const response = await fetch(`https://registry.npmjs.org/@tryforge/cli`);
     const data = await response.json();
     const latestVersion = data["dist-tags"].latest;
-    spinner.stop();
+    spinner.Stop();
     if (latestVersion !== version) {
       console.log(
         `${import_chalk4.default.yellow("A new version is available!")} ${import_chalk4.default.gray(version)} \u2192 ${import_chalk4.default.green(latestVersion)}`
@@ -1067,13 +1125,8 @@ var Version = new import_commander2.Command("version").description("Returns the 
       console.log(import_chalk4.default.green("You are using the latest version.\n"));
     }
   } catch (err) {
-    spinner.stop();
+    spinner.Stop();
     console.error(`${import_chalk4.default.red("[ERROR]")} ${err.message}`);
-  }
-  try {
-    throw new Error("Something went wrong!");
-  } catch (err) {
-    ErrorManager.Handle(err, false, "test");
   }
 });
 
