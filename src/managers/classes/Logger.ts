@@ -112,31 +112,31 @@ export class Logger implements LoggerScheme {
     
     switch (level) {
       case (LogLevel.TRACE):
-        args.forEach(arg => console.log(`${chalk.gray(prefix)} ${chalk.gray(arg)}`))
+        args.forEach(arg => console.log(`${chalk.gray(`[${prefix}]`)}] ${chalk.gray(arg)}`))
         break
 
       case (LogLevel.DEBUG):
-        args.forEach(arg => console.log(`${chalk.yellow(prefix)} ${chalk.yellow(arg)}`))
+        args.forEach(arg => console.log(`${chalk.yellow(`[${prefix}]`)} ${chalk.yellow(arg)}`))
         break
 
       case (LogLevel.INFO):
-        args.forEach(arg => console.log(`${chalk.blue(prefix)} ${chalk.blue(arg)}`))
+        args.forEach(arg => console.log(`${chalk.blue(`[${prefix}]`)} ${chalk.blue(arg)}`))
         break
 
       case (LogLevel.SUCCESS):
-        args.forEach(arg => console.log(`${chalk.green(prefix)} ${chalk.green(arg)}`))
+        args.forEach(arg => console.log(`${chalk.green(`[${prefix}]`)} ${chalk.green(arg)}`))
         break
 
       case (LogLevel.WARN):
-        args.forEach(arg => console.log(`${chalk.yellow(prefix)} ${chalk.yellow(arg)}`))
+        args.forEach(arg => console.log(`${chalk.yellow(`[${prefix}]`)} ${chalk.yellow(arg)}`))
         break
 
       case (LogLevel.ERROR):
-        args.forEach(arg => console.log(`${chalk.red(prefix)} ${chalk.red(arg)}`))
+        args.forEach(arg => console.log(`${chalk.red(`[${prefix}]`)} ${chalk.red(arg)}`))
         break
 
       case (LogLevel.FATAL):
-        args.forEach(arg => console.log(`${chalk.red(prefix)} ${chalk.red(arg)}`))
+        args.forEach(arg => console.log(`${chalk.red(`[${prefix}]`)} ${chalk.red(arg)}`))
         break
     }
   }
@@ -145,7 +145,7 @@ export class Logger implements LoggerScheme {
    * Logs a trace message.
    * @param args The message arguments.
    */
-  public trace(...args: string[]): void {
+  public static trace(...args: string[]): void {
     Logger.log(LogLevel.TRACE, ...args);
   }
 
@@ -153,7 +153,7 @@ export class Logger implements LoggerScheme {
    * Logs a debug message.
    * @param args The message arguments.
    */
-  public debug(...args: string[]): void {
+  public static debug(...args: string[]): void {
     Logger.log(LogLevel.DEBUG, ...args);
   }
 
@@ -161,7 +161,7 @@ export class Logger implements LoggerScheme {
    * Logs an info message.
    * @param args The message arguments.
    */
-  public info(...args: string[]): void {
+  public static info(...args: string[]): void {
     Logger.log(LogLevel.INFO, ...args);
   }
 
@@ -169,7 +169,7 @@ export class Logger implements LoggerScheme {
    * Logs a success message.
    * @param args The message arguments.
    */
-  public success(...args: string[]): void {
+  public static success(...args: string[]): void {
     Logger.log(LogLevel.SUCCESS, ...args);
   }
 
@@ -177,7 +177,7 @@ export class Logger implements LoggerScheme {
    * Logs a warning message.
    * @param args The message arguments.
    */
-  public warn(...args: string[]): void {
+  public static warn(...args: string[]): void {
     Logger.log(LogLevel.WARN, ...args);
   }
 
@@ -185,7 +185,7 @@ export class Logger implements LoggerScheme {
    * Logs an error message.
    * @param args The message arguments.
    */
-  public error(...args: string[]): void {
+  public static error(...args: string[]): void {
     Logger.log(LogLevel.ERROR, ...args);
   }
 
@@ -193,7 +193,7 @@ export class Logger implements LoggerScheme {
    * Logs a fatal error message.
    * @param args The message arguments.
    */
-  public fatal(...args: string[]): void {
+  public static fatal(...args: string[]): void {
     Logger.log(LogLevel.FATAL, ...args);
   }
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -676,25 +676,25 @@ var Logger = class _Logger {
     const prefix = LogLevel[level];
     switch (level) {
       case 0 /* TRACE */:
-        args.forEach((arg) => console.log(`${import_chalk.default.gray(prefix)} ${import_chalk.default.gray(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.gray(`[${prefix}]`)}] ${import_chalk.default.gray(arg)}`));
         break;
       case 1 /* DEBUG */:
-        args.forEach((arg) => console.log(`${import_chalk.default.yellow(prefix)} ${import_chalk.default.yellow(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.yellow(`[${prefix}]`)} ${import_chalk.default.yellow(arg)}`));
         break;
       case 2 /* INFO */:
-        args.forEach((arg) => console.log(`${import_chalk.default.blue(prefix)} ${import_chalk.default.blue(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.blue(`[${prefix}]`)} ${import_chalk.default.blue(arg)}`));
         break;
       case 3 /* SUCCESS */:
-        args.forEach((arg) => console.log(`${import_chalk.default.green(prefix)} ${import_chalk.default.green(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.green(`[${prefix}]`)} ${import_chalk.default.green(arg)}`));
         break;
       case 4 /* WARN */:
-        args.forEach((arg) => console.log(`${import_chalk.default.yellow(prefix)} ${import_chalk.default.yellow(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.yellow(`[${prefix}]`)} ${import_chalk.default.yellow(arg)}`));
         break;
       case 5 /* ERROR */:
-        args.forEach((arg) => console.log(`${import_chalk.default.red(prefix)} ${import_chalk.default.red(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.red(`[${prefix}]`)} ${import_chalk.default.red(arg)}`));
         break;
       case 6 /* FATAL */:
-        args.forEach((arg) => console.log(`${import_chalk.default.red(prefix)} ${import_chalk.default.red(arg)}`));
+        args.forEach((arg) => console.log(`${import_chalk.default.red(`[${prefix}]`)} ${import_chalk.default.red(arg)}`));
         break;
     }
   }
@@ -702,49 +702,49 @@ var Logger = class _Logger {
    * Logs a trace message.
    * @param args The message arguments.
    */
-  trace(...args) {
+  static trace(...args) {
     _Logger.log(0 /* TRACE */, ...args);
   }
   /**
    * Logs a debug message.
    * @param args The message arguments.
    */
-  debug(...args) {
+  static debug(...args) {
     _Logger.log(1 /* DEBUG */, ...args);
   }
   /**
    * Logs an info message.
    * @param args The message arguments.
    */
-  info(...args) {
+  static info(...args) {
     _Logger.log(2 /* INFO */, ...args);
   }
   /**
    * Logs a success message.
    * @param args The message arguments.
    */
-  success(...args) {
+  static success(...args) {
     _Logger.log(3 /* SUCCESS */, ...args);
   }
   /**
    * Logs a warning message.
    * @param args The message arguments.
    */
-  warn(...args) {
+  static warn(...args) {
     _Logger.log(4 /* WARN */, ...args);
   }
   /**
    * Logs an error message.
    * @param args The message arguments.
    */
-  error(...args) {
+  static error(...args) {
     _Logger.log(5 /* ERROR */, ...args);
   }
   /**
    * Logs a fatal error message.
    * @param args The message arguments.
    */
-  fatal(...args) {
+  static fatal(...args) {
     _Logger.log(6 /* FATAL */, ...args);
   }
 };
@@ -1194,6 +1194,7 @@ ${import_chalk3.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/
 var import_chalk4 = __toESM(require("chalk"));
 var import_commander2 = require("commander");
 var Version = new import_commander2.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
+  Logger.warn("Test");
   console.log(`Current version: ${import_chalk4.default.cyan(version)}
 `);
   const spinner = new ProgressManager();

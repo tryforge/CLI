@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * Represents metadata about a function within a TypeScript file.
  * This interface is useful for documentation generation, CLI analysis, and introspection.
