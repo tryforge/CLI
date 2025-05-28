@@ -17,7 +17,7 @@ interface ConfigurationScheme {
    * @returns A promise that resolves to the configuration object of type `T` if the configuration file exists,
    *          or `null` if the file does not exist.
    */
-  GetConfiguration?(): Promise<Record<string, string> | null>;
+  GetConfiguration?<T = any>(): Promise<T | null>;
 
   /**
    * Asynchronously sets the configuration by writing the provided key-value pairs to a JSON file
@@ -38,7 +38,7 @@ interface ConfigurationScheme {
    * @param {T} value - The value to assign to the configuration key.
    * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
    */
-  SetConfigurationKey?<T>(
+  SetConfigurationKey?<T = any>(
     key: string,
     value: T
   ): Promise<boolean>;
@@ -66,7 +66,7 @@ interface ConfigurationScheme {
    * @returns {Promise<T | undefined>} A promise that resolves to the value associated with the given key,
    * or `undefined` if the key does not exist or the configuration is not available.
    */
-  GetConfigurationKey?<T>(
+  GetConfigurationKey?<T = any>(
     key: string
   ): Promise<T>;
 
@@ -96,7 +96,7 @@ export class ConfigurationManager implements ConfigurationScheme {
    * @returns A promise that resolves to the configuration object of type `T` if the configuration file exists,
    *          or `null` if the file does not exist.
    */
-  public static async GetConfiguration<T>(): Promise<T | null> {
+  public static async GetConfiguration<T = any>(): Promise<T | null> {
     if (!(await FileSystem.FileExists(this.ConfigurationPath))) return null;
     return await FileSystem.ReadJSON(this.ConfigurationPath);
   };
@@ -122,7 +122,7 @@ export class ConfigurationManager implements ConfigurationScheme {
    * @param {T} value - The value to assign to the configuration key.
    * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
    */
-  public static async SetConfigurationKey<T>(key: string, value: T): Promise<boolean> {
+  public static async SetConfigurationKey<T = any>(key: string, value: T): Promise<boolean> {
     let configuration: Record<string, any> = (await this.GetConfiguration()) || {};
     configuration[key] = value;
     return await FileSystem.WriteJSON(this.ConfigurationPath, configuration);
@@ -156,7 +156,7 @@ export class ConfigurationManager implements ConfigurationScheme {
    * @returns {Promise<T | undefined>} A promise that resolves to the value associated with the given key,
    * or `undefined` if the key does not exist or the configuration is not available.
    */
-  public static async GetConfigurationKey<T>(key: string): Promise<T | undefined> {
+  public static async GetConfigurationKey<T = any>(key: string): Promise<T | undefined> {
     const configuration = await this.GetConfiguration() as Record<string, any> | null;
     return configuration ? (configuration[key] as T) : undefined;
   };
