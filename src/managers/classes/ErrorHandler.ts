@@ -65,11 +65,6 @@ interface ErrorScheme {
     error: Error | string,
     context?: string
   ): void;
-
-  Wrap?<T>(
-    fn: () => Promise<T>,
-    context?: string
-  ): Promise<T | undefined>;
 }
 
 /**
