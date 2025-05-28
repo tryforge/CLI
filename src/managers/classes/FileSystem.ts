@@ -13,9 +13,9 @@ interface FileScheme {
    * @param path - The path to the file.
    * @returns A promise that resolves to the file contents as a string or Buffer.
    */
-  ReadFile?(
+  ReadFile?<T = string>(
     path: string
-  ): Promise<string>;
+  ): Promise<T>;
 
   /**
    * Writes data to a file at the given path.
@@ -64,9 +64,9 @@ interface FileScheme {
    * @param path - The path to the JSON file.
    * @returns A promise that resolves to the parsed JSON object.
    */
-  ReadJSON?(
+  ReadJSON?<T = any>(
     path: string
-  ): Promise<any | null>;
+  ): Promise<T | null>;
 
   /**
    * Writes an object as JSON to a file at the given path.
@@ -74,9 +74,9 @@ interface FileScheme {
    * @param object - The object to serialize and write as JSON.
    * @returns A promise that resolves to true if the write was successful, false otherwise.
    */
-  WriteJSON?(
+  WriteJSON?<T = any>(
     path: string,
-    object: any
+    object: T
   ): Promise<boolean>;
 
   /**
