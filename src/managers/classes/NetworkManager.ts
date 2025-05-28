@@ -15,7 +15,7 @@ interface NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response data of type `T`, or `null` if the request fails.
    */
-  Get?<T>(
+  Get?<T = any>(
     endpoint: string,
     headers: Record<string, string>
   ): Promise<T | null>
@@ -29,7 +29,7 @@ interface NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  Post?<T>(
+  Post?<T = any>(
     endpoint: string,
     body: object,
     headers?: Record<string, string>
@@ -44,7 +44,7 @@ interface NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  Put?<T>(
+  Put?<T = any>(
     endpoint: string,
     body: object,
     headers?: Record<string, string>
@@ -58,7 +58,7 @@ interface NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  Delete?<T>(
+  Delete?<T = any>(
     endpoint: string,
     headers?: Record<string, string>
   ): Promise<T | null>;
@@ -73,7 +73,7 @@ interface NetworkScheme {
    * @param headers - Optional additional headers to include in the request.
    * @returns A promise that resolves to the parsed JSON response of type `T`, or `null` if the request fails or the response is not valid JSON.
    */
-  Request?<T>(
+  Request?<T = any>(
     method: string,
     endpoint: string,
     headers?: Record<string, string>,
@@ -105,7 +105,7 @@ export class NetworkManager implements NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response data of type `T`, or `null` if the request fails.
    */
-  public async Get<T>(
+  public async Get<T = any>(
     endpoint: string,
     headers: Record<string, string> = {}
   ): Promise<T | null> {
@@ -121,7 +121,7 @@ export class NetworkManager implements NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async Post<T>(
+  public async Post<T = any>(
     endpoint: string,
     body: object,
     headers: Record<string, string> = {}
@@ -138,7 +138,7 @@ export class NetworkManager implements NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async Put<T>(
+  public async Put<T = any>(
     endpoint: string,
     body: object,
     headers: Record<string, string> = {}
@@ -154,7 +154,7 @@ export class NetworkManager implements NetworkScheme {
    * @param headers - Optional HTTP headers to include in the request.
    * @returns A promise that resolves to the response of type `T`, or `null` if the request fails.
    */
-  public async Delete<T>(
+  public async Delete<T = any>(
     endpoint: string,
     headers: Record<string, string> = {}
   ): Promise<T | null> {
@@ -171,7 +171,7 @@ export class NetworkManager implements NetworkScheme {
    * @param headers - Optional additional headers to include in the request.
    * @returns A promise that resolves to the parsed JSON response of type `T`, or `null` if the request fails or the response is not valid JSON.
    */
-  public async Request<T>(
+  public async Request<T = any>(
     method: string,
     endpoint: string,
     headers: Record<string, string> = {},
