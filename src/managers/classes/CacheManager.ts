@@ -12,7 +12,7 @@ type CacheScope = 'user' | 'workspace';
 /**
  * An interface representing the content of a cache file object.
  */
-interface CacheContent<T> {
+interface CacheContent<T = any> {
   updatedAt: Date;
   data: T;
 }
@@ -37,7 +37,7 @@ interface CacheScheme {
    * @param data - The cache content to write to the file.
    * @returns A promise that resolves to `true` if the write operation was successful, otherwise `false`.
    */
-  WriteCache?<T>(
+  WriteCache?<T = any>(
     scope: CacheScope,
     filePath: string,
     data: CacheContent<T>
@@ -51,7 +51,7 @@ interface CacheScheme {
    * @param filePath - The relative path to the cache file.
    * @returns A promise that resolves to the parsed cache content of type `CacheContent<T>`.
    */
-  ReadCache?<T>(
+  ReadCache?<T = any>(
     scope: CacheScope,
     filePath: string
   ): Promise<CacheContent<T> | null>
@@ -140,7 +140,7 @@ export class CacheManager implements CacheScheme {
    * @param data - The cache content to write to the file.
    * @returns A promise that resolves to `true` if the write operation was successful, otherwise `false`.
    */
-  public static async WriteCache<T>(
+  public static async WriteCache<T = any>(
     scope: CacheScope,
     filePath: string,
     data: CacheContent<T>
@@ -159,7 +159,7 @@ export class CacheManager implements CacheScheme {
    * @param filePath - The relative path to the cache file.
    * @returns A promise that resolves to the parsed cache content of type `CacheContent<T>`.
    */
-  public static async ReadCache<T>(
+  public static async ReadCache<T = any>(
     scope: CacheScope,
     filePath: string,
   ): Promise<CacheContent<T>> {
