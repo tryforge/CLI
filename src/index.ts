@@ -15,6 +15,8 @@ import { Command } from 'commander';
 import { IFileMetadata } from './structure';
 import { version } from '../package.json';
 
+import { ForgeCommand } from './core/classes/ForgeCommand';
+
 /**
  * Importing the commands from the source folder.
 */
@@ -38,11 +40,22 @@ ForgeCLI
   .description('A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.')
   .version(version);
 
+  const CommandD = new ForgeCommand('testing')
+  .description('This command shows the version of the CLI.')
+  .preExecute(async () => { console.log('Hello world')})
+  .preExecute(async () => { console.log('Testing')})
+  .action(() => {
+    console.log('v0.0.1')
+  })
+  .preExecute(async () => { console.log('Hello world')})
+  .preExecute(async () => { console.log('Hello world')})
+
 /**
  * Adding the commands to the BotForge command line interface.
 */
 ForgeCLI.addCommand(Search);
 ForgeCLI.addCommand(Version)
+ForgeCLI.addCommand(CommandD);
 
 /**
  * Parse command line arguments and execute the requested command.
