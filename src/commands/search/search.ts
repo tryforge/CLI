@@ -4,6 +4,7 @@ import { Command } from 'commander';
 
 import { SearchMetadata } from '../../functions';
 import type { ICommandMetadata, IFileMetadata, TSearchResult, TSearchType } from '../../structure';
+import { ForgeCommand } from '../../core';
 
 /**
  * Valid search type options for BotForge object types.
@@ -87,7 +88,7 @@ async function ExecuteSearch(
  * @option {boolean} fetch - Fetch information using HTTP request and forces to cache the results.
  * @since 0.0.1
  */
-export const Search: Command = new Command('search')
+export const Search: ForgeCommand = new ForgeCommand('search')
   .aliases(['s', 'lookup'])
   .description('Search for a specific function, enum or event in BotForge\'s documentation.')
   .argument('<type>', 'The type of object to search for (or their shortcuts).')

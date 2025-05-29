@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { ProgressManager } from '../../managers';
 import { version as currentVersion, name as packageName } from '../../../package.json';
 import type { ICommandMetadata, IFileMetadata } from '../../structure';
+import { ForgeCommand } from '../../core';
 
 /**
  * Prints the current CLI version and checks for updates from the npm registry.
@@ -16,7 +17,7 @@ import type { ICommandMetadata, IFileMetadata } from '../../structure';
  * @since 0.0.1
  * @command version
  */
-export const Version: Command = new Command('version')
+export const Version: ForgeCommand = new ForgeCommand('version')
   .description('Returns the current version of the CLI and checks for updates.')
   .aliases(['v', 'ver'])
   .action(async () => {
