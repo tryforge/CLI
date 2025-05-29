@@ -16,11 +16,13 @@ import { IFileMetadata } from './structure';
 import { version } from '../package.json';
 
 import { ForgeCommand } from './core/classes/ForgeCommand';
+import { CommandRegistry } from './core/classes/CommandRegistry';
 
 /**
  * Importing the commands from the source folder.
 */
 import { Search, Version } from './commands';
+const CommandFF= [Search, Version]
 
 /**
  * The main CLI instance for the Forge tool.
@@ -30,6 +32,7 @@ import { Search, Version } from './commands';
  * @type {Command}
 */
 const ForgeCLI: Command = new Command();
+
 
 /**
  * Configure the CLI with name, description, and version information.
@@ -53,9 +56,12 @@ ForgeCLI
 /**
  * Adding the commands to the BotForge command line interface.
 */
-ForgeCLI.addCommand(Search);
-ForgeCLI.addCommand(Version)
-ForgeCLI.addCommand(CommandD);
+// ForgeCLI.addCommand(Search);
+// ForgeCLI.addCommand(Version)
+// ForgeCLI.addCommand(CommandD);
+
+const Registry = new CommandRegistry(ForgeCLI)
+Registry.Register(CommandFF)
 
 /**
  * Parse command line arguments and execute the requested command.

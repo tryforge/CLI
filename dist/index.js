@@ -34,7 +34,7 @@ __export(index_exports, {
   FileMetadata_index: () => FileMetadata_index
 });
 module.exports = __toCommonJS(index_exports);
-var import_commander4 = require("commander");
+var import_commander2 = require("commander");
 
 // package.json
 var name = "@tryforge/cli";
@@ -109,10 +109,73 @@ var ForgeCommand = class extends import_commander.Command {
   }
 };
 
+// src/core/classes/CommandRegistry.ts
+var CommandRegistry = class {
+  /**
+   * Creates an instance of the CommandRegistry class.
+   * 
+   * @param CLI - The root command instance to be registered with the command registry.
+   */
+  constructor(CLI) {
+    /**
+     * Stores the mapping of command names to their corresponding `ForgeCommand` instances.
+     */
+    this.registeredCommands = /* @__PURE__ */ new Map();
+    this.CLI = CLI;
+  }
+  /**
+   * Registers an array of `ForgeCommand` instances with the CLI.
+   * 
+   * For each command in the provided array, this method checks if the command
+   * has already been registered (by its name). If not, it adds the command to
+   * the CLI and marks it as registered.
+   *
+   * @param commands - An array of `ForgeCommand` objects to register.
+   */
+  Register(commands) {
+    commands.forEach((command) => {
+      if (!this.registeredCommands.has(command.name())) {
+        this.CLI.addCommand(command);
+        this.registeredCommands.set(command.name(), command);
+      }
+    });
+  }
+  /**
+   * Unregisters a command from the registry by its name.
+   *
+   * @param commandName - The name of the command to unregister.
+   * @remarks
+   * If the command with the specified name exists in the registry, it will be removed.
+   * If the command does not exist, this method does nothing.
+   */
+  Unregister(commandName) {
+    const command = this.registeredCommands.get(commandName);
+    if (command) {
+      this.registeredCommands.delete(commandName);
+    }
+  }
+  /**
+   * Retrieves a registered command by its name.
+   *
+   * @param commandName - The name of the command to retrieve.
+   * @returns The {@link ForgeCommand} instance if found; otherwise, `undefined`.
+   */
+  GetCommand(commandName) {
+    return this.registeredCommands.get(commandName);
+  }
+  /**
+   * Returns a list of all registered command names.
+   *
+   * @returns {string[]} An array containing the names of all commands currently registered in the registry.
+   */
+  ListCommands() {
+    return Array.from(this.registeredCommands.keys());
+  }
+};
+
 // src/commands/search/search.ts
 var import_chalk = __toESM(require("chalk"));
 var import_ora = __toESM(require("ora"));
-var import_commander2 = require("commander");
 
 // src/functions/functions/searching/searchMetadata.ts
 async function SearchMetadata(normalizedType, data, targetName, defaultValue) {
@@ -153,6 +216,9 @@ async function SearchMetadata(normalizedType, data, targetName, defaultValue) {
   }
 }
 
+// src/core/classes/EventBus.ts
+var import_node_events = require("events");
+
 // src/commands/search/search.ts
 var ValidSearchTypes = {
   "function": "function",
@@ -185,7 +251,7 @@ async function ExecuteSearch(normalizedType, preparedObjectName, extension, dev,
   const Functions = await requestMetadata(normalizedType, extension, !!dev, !!debug, !!forceFetch);
   return SearchMetadata(normalizedType, Functions, preparedObjectName, null);
 }
-var Search = new import_commander2.Command("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
+var Search = new ForgeCommand("search").aliases(["s", "lookup"]).description("Search for a specific function, enum or event in BotForge's documentation.").argument("<type>", "The type of object to search for (or their shortcuts).").argument("<object>", "The object name to search for (case insensitive).").option("-e, --extension <extension>", "Specify an extension to limit the search scope.").option("-r, --raw", "Output the result as raw JSON instead of formatted text.").option("-d, --dev", "Perform your research on the development branch.").option("--debug", "Show debug information during the search process.").option("--fetch", "Fetch information using HTTP request and forces to cache the results.").action(async (type, object, options) => {
   const SearchType = type.toLowerCase();
   const Spinner = (0, import_ora.default)(`Searching for ${SearchType} '${object}'...`).start();
   try {
@@ -240,7 +306,6 @@ ${import_chalk.default.yellow("[DEBUG]")} Requesting (GET) 'https://github.com/t
 
 // src/commands/system/version.ts
 var import_chalk3 = __toESM(require("chalk"));
-var import_commander3 = require("commander");
 
 // src/managers/classes/FileSystem.ts
 var import_os = __toESM(require("os"));
@@ -1048,7 +1113,7 @@ var UpdateChecker = class {
 };
 
 // src/commands/system/version.ts
-var Version = new import_commander3.Command("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
+var Version = new ForgeCommand("version").description("Returns the current version of the CLI and checks for updates.").aliases(["v", "ver"]).action(async () => {
   console.log(`Current version: ${import_chalk3.default.cyan(version)}
 `);
   const spinner = new ProgressManager();
@@ -1074,7 +1139,8 @@ var Version = new import_commander3.Command("version").description("Returns the 
 });
 
 // src/index.ts
-var ForgeCLI = new import_commander4.Command();
+var CommandFF = [Search, Version];
+var ForgeCLI = new import_commander2.Command();
 ForgeCLI.name("forge").description("A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.").version(version);
 var CommandD = new ForgeCommand("testing").description("This command shows the version of the CLI.").preExecute(async () => {
   console.log("Hello world");
@@ -1087,9 +1153,8 @@ var CommandD = new ForgeCommand("testing").description("This command shows the v
 }).preExecute(async () => {
   console.log("Hello world");
 });
-ForgeCLI.addCommand(Search);
-ForgeCLI.addCommand(Version);
-ForgeCLI.addCommand(CommandD);
+var Registry = new CommandRegistry(ForgeCLI);
+Registry.Register(CommandFF);
 ForgeCLI.parseAsync(process.argv);
 var FileMetadata_index = {
   filename: "index.ts",
