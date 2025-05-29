@@ -284,31 +284,3 @@ export class EventBus implements EventBusScheme {
     }
   }
 }
-
-// Usage example:
-const eventBus = new EventBus({ maxListeners: 50 });
-
-// Chaining support
-eventBus
-  .on<string>('user:login', (username) => {
-    console.log(`User ${username} logged in`);
-  })
-  .on<{ id: number; name: string }>('user:created', (user) => {
-    console.log(`New user created: ${user.name} (ID: ${user.id})`);
-  });
-
-// One-time listener
-eventBus.once<string>('app:ready', (message) => {
-  console.log('App is ready:', message);
-});
-
-// Emit events
-eventBus.emit('user:login', 'john_doe');
-eventBus.emit('user:created', { id: 1, name: 'John Doe' });
-eventBus.emit('app:ready', 'All systems operational');
-
-// Check listener count
-console.log('Login listeners:', eventBus.listenerCount('user:login'));
-
-// Get all event names
-console.log('Active events:', eventBus.eventNames());
