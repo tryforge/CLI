@@ -1,13 +1,13 @@
 import chalk from 'chalk';
 
-import { CacheManager, NetworkManager } from '../../managers';
+import { CacheManager, NetworkManager } from '../../../managers';
 import type { 
   TExtension, 
   TSearchType, 
   TRequestResult, 
   IFunctionMetadata, 
   IFileMetadata
-} from '../../structure';
+} from '../../../structure';
 
 const ONE_HOUR_MS: number = 60 * 60 * 1000;
 const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/tryforge';
