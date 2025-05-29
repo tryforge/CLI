@@ -145,7 +145,7 @@ export class Logger implements LoggerScheme {
    * Logs a trace message.
    * @param args The message arguments.
    */
-  public static trace(...args: string[]): void {
+  public static trace(...args: any[]): void {
     Logger.log(LogLevel.TRACE, ...args);
   }
 
@@ -153,7 +153,7 @@ export class Logger implements LoggerScheme {
    * Logs a debug message.
    * @param args The message arguments.
    */
-  public static debug(...args: string[]): void {
+  public static debug(...args: any[]): void {
     Logger.log(LogLevel.DEBUG, ...args);
   }
 
@@ -161,7 +161,7 @@ export class Logger implements LoggerScheme {
    * Logs an info message.
    * @param args The message arguments.
    */
-  public static info(...args: string[]): void {
+  public static info(...args: any[]): void {
     Logger.log(LogLevel.INFO, ...args);
   }
 
@@ -169,7 +169,7 @@ export class Logger implements LoggerScheme {
    * Logs a success message.
    * @param args The message arguments.
    */
-  public static success(...args: string[]): void {
+  public static success(...args: any[]): void {
     Logger.log(LogLevel.SUCCESS, ...args);
   }
 
@@ -177,7 +177,7 @@ export class Logger implements LoggerScheme {
    * Logs a warning message.
    * @param args The message arguments.
    */
-  public static warn(...args: string[]): void {
+  public static warn(...args: any[]): void {
     Logger.log(LogLevel.WARN, ...args);
   }
 
@@ -185,7 +185,7 @@ export class Logger implements LoggerScheme {
    * Logs an error message.
    * @param args The message arguments.
    */
-  public static error(...args: string[]): void {
+  public static error(...args: any[]): void {
     Logger.log(LogLevel.ERROR, ...args);
   }
 
@@ -193,7 +193,7 @@ export class Logger implements LoggerScheme {
    * Logs a fatal error message.
    * @param args The message arguments.
    */
-  public static fatal(...args: string[]): void {
+  public static fatal(...args: any[]): void {
     Logger.log(LogLevel.FATAL, ...args);
   }
 }
