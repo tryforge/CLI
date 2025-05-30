@@ -66,3 +66,7 @@ tmp/
 # Build
 /*.tgz
 /out/
+
+# Dev folders
+archives/
+storage/
