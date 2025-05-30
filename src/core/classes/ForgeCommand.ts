@@ -1,3 +1,4 @@
+// Local modules.
 import { Command } from 'commander';
 
 /**

@@ -7,7 +7,7 @@ import { FileSystem } from "./FileSystem";
 /**
  * A type representing available caching scopes.
  */
-type CacheScope = 'user' | 'workspace';
+export type CacheScope = 'user' | 'workspace';
 
 /**
  * An interface representing the content of a cache file object.
@@ -107,7 +107,7 @@ interface CacheScheme {
    * @param filePath - The relative path to the cache file.
    * @returns A promise that resolves to the cache metadata containing `updatedAt`, or `null` if not found.
    */
-  GetCacheMetadata?(
+  CacheMetadata?(
     scope: CacheScope,
     filePath: string
   ): Promise<CacheMetadata>;

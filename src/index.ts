@@ -10,19 +10,19 @@
  * @version 0.0.1
 */
 
-
+// External packages.
 import { Command } from 'commander';
-import { IFileMetadata } from './structure';
+
+// Package.json
 import { version } from '../package.json';
 
-import { ForgeCommand } from './core/classes/ForgeCommand';
+// Local modules.
 import { CommandRegistry } from './core/classes/CommandRegistry';
 
 /**
  * Importing the commands from the source folder.
 */
-import { Search, Version } from './commands';
-const CommandFF= [Search, Version]
+import { Commands } from './commands';
 
 /**
  * The main CLI instance for the Forge tool.
@@ -43,25 +43,20 @@ ForgeCLI
   .description('A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.')
   .version(version);
 
-  const CommandD = new ForgeCommand('testing')
-  .description('This command shows the version of the CLI.')
-  .preExecute(async () => { console.log('Hello world')})
-  .preExecute(async () => { console.log('Testing')})
-  .action(() => {
-    console.log('v0.0.1')
-  })
-  .preExecute(async () => { console.log('Hello world')})
-  .preExecute(async () => { console.log('Hello world')})
 
 /**
- * Adding the commands to the BotForge command line interface.
-*/
-// ForgeCLI.addCommand(Search);
-// ForgeCLI.addCommand(Version)
-// ForgeCLI.addCommand(CommandD);
-
-const Registry = new CommandRegistry(ForgeCLI)
-Registry.Register(CommandFF)
+ * An instance of the CommandRegistry class, initialized with the ForgeCLI.
+ * 
+ * @remarks
+ * This registry is responsible for managing and registering all available commands
+ * within the ForgeCLI application. It acts as the central point for command discovery,
+ * execution, and lifecycle management.
+ * 
+ * @see CommandRegistry
+ * @see ForgeCLI
+ */
+const Registry = new CommandRegistry(ForgeCLI);
+Registry.Register(Commands);
 
 /**
  * Parse command line arguments and execute the requested command.
@@ -71,15 +66,3 @@ Registry.Register(CommandFF)
  * @returns {Promise<void>} A promise that resolves when command execution is complete
 */
 ForgeCLI.parseAsync(process.argv);
-
-/**
- * File metadata for: index.ts
- */
-export const FileMetadata_index: IFileMetadata = {
-  filename: 'index.ts',
-  createdAt: new Date('2025-05-11T18:58:00+02:00'),
-  updatedAt: new Date('2025-05-13T16:38:00+02:00'),
-  author: 'Sébastien (@striatp)',
-  description: 'This is the main file that defines the CLI structure and architecture.',
-  tags: ['CLI', 'Index', 'Structure']
-};
