@@ -4,7 +4,7 @@ Thank you for considering contributing to ForgeCLI! We welcome contributions, an
 
 ## Reporting Bugs
 
-If you encounter any bugs, please [open an issue](https://github.com/Striatp/ForgeCLI/issues) with a clear description of the problem, and steps to reproduce it.
+If you encounter any bugs, please [open an issue](https://github.com/tryforge/CLI/issues) with a clear description of the problem, and steps to reproduce it.
 
 ## Submitting Pull Requests
 

@@ -1,7 +1,7 @@
-// Node.js built-ins
+// Node.js built-ins.
 import path from 'path';
 
-// Local modules
+// Local modules.
 import { FileSystem } from "./FileSystem";
 
 /**
