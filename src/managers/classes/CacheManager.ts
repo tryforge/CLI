@@ -142,34 +142,21 @@ export class CacheManager implements CacheScheme {
    * If the operation is successful, it returns a Promise that resolves to `true`; otherwise, it resolves to `false`.
    * This method is asynchronous and should be awaited.
    * 
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   * 
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/CacheManager.ts)
+   * 
    * @template T - The type of the cache content to write.
    * 
-   * [View on GitHub](https://github.com/tryforge/CLI/blob/dev/src/managers/classes/CacheManager.ts).
-   */
-  public static async WriteCache<T = unknown>(
-    scope: CacheScope,
-    filePath: string,
-    data: CacheContent<T>
-  ): Promise<boolean>;
-
-  /**
    * Example usage:
    * ```typescript
    * await CacheManager.WriteCache('user', 'settings/cache.json', { updatedAt: new Date(), data: { theme: 'dark' } });
    * ```
    *
    * For more details on the cache structure, see the [CacheContent type definition](./CacheManager.ts).
-   *
-   * @template T - The type of the cache content to write.
    * 
-   * [View on GitHub](https://github.com/tryforge/CLI/blob/dev/src/managers/classes/CacheManager.ts).
+   * .
    */
-  public static async WriteCache<T = unknown>(
-    scope: CacheScope,
-    filePath: string,
-    data: CacheContent<T>
-  ): Promise<boolean>;
-
   public static async WriteCache<T = unknown>(
     scope: CacheScope,
     filePath: string,
@@ -316,3 +303,5 @@ export class CacheManager implements CacheScheme {
     return await FileSystem.WriteJSON(toPath, data);
   }
 }
+
+CacheManager.WriteCache
