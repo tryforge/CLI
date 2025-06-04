@@ -1,1 +1,3 @@
-export const Commands: ForgeCommand[] = []
+import { ForgeCommand } from "../core";
+
+export const Commands: Array<ForgeCommand> = []
