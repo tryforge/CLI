@@ -4,9 +4,6 @@
 // src/index.ts
 var import_commander = require("commander");
 
-// package.json
-var version = "0.0.1";
-
 // src/core/classes/CommandRegistry.ts
 var CommandRegistry = class {
   /**
@@ -76,7 +73,8 @@ var Commands = [];
 
 // src/index.ts
 var ForgeCLI = new import_commander.Command();
-ForgeCLI.name("forge").description("A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.").version(version);
+ForgeCLI.name("forge").description("A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.").option("-h, --help", "").option("-v, --version", "").action(async (options) => {
+});
 var Registry = new CommandRegistry(ForgeCLI);
 Registry.Register(Commands);
 ForgeCLI.parseAsync(process.argv);

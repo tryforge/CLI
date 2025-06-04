@@ -2,13 +2,13 @@
   "name": "@tryforge/cli",
   "version": "0.0.1",
   "description": "A powerful CLI tool for BotForge & ForgeScript to bootstrap projects, scaffold command files, generate templates, and simplify script setups.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./bin/index.js",
+  "types": "./bin/index.d.ts",
   "bin": {
-    "forge": "./dist/index.js"
+    "forge": "./bin/index.js"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs --target node18 --dts",
+    "build": "tsup src/index.ts --format cjs --target node18 --dts --out-dir bin",
     "dev": "tsup src/index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src --ext .ts",
@@ -42,10 +42,10 @@
   },
   "homepage": "https://github.com/tryforge/CLI#readme",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./bin/index.js"
   },
   "files": [
-    "dist",
+    "bin",
     "LICENSE",
     "README.md",
     "CONTRIBUTE.md"
