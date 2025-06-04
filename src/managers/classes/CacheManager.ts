@@ -12,17 +12,17 @@ export type CacheScope = 'user' | 'workspace';
 /**
  * An interface representing the content of a cache file object.
  */
-interface CacheContent<T = any> {
+export type CacheContent<T = unknown> = {
   updatedAt: Date;
   data: T;
-}
+};
 
 /**
  * An interface representing the metadata of a cache file.
  */
 interface CacheMetadata {
   updatedAt: Date;
-}
+};
 
 /**
  * An interface representing how the CacheManager class is structured.
@@ -37,7 +37,7 @@ interface CacheScheme {
    * @param data - The cache content to write to the file.
    * @returns A promise that resolves to `true` if the write operation was successful, otherwise `false`.
    */
-  WriteCache?<T = any>(
+  WriteCache?<T = unknown>(
     scope: CacheScope,
     filePath: string,
     data: CacheContent<T>
@@ -51,7 +51,7 @@ interface CacheScheme {
    * @param filePath - The relative path to the cache file.
    * @returns A promise that resolves to the parsed cache content of type `CacheContent<T>`.
    */
-  ReadCache?<T = any>(
+  ReadCache?<T = unknown>(
     scope: CacheScope,
     filePath: string
   ): Promise<CacheContent<T> | null>
@@ -125,22 +125,52 @@ interface CacheScheme {
     toScope: CacheScope,
     filePath: string
   ): Promise<boolean>;
-}
+};
 
 /**
  * A class to manage local and workspace-located cache.
  */
 export class CacheManager implements CacheScheme {
+
   /**
    * Writes cache data to a JSON file at the specified path, based on the given cache scope.
    *
+   * This static method allows you to persist cache content of any type to a file, either in the user or workspace scope.
+   * You provide the `scope` (either `'user'` or `'workspace'`), the `filePath` (a string representing the relative path where the cache should be stored), 
+   * and the `data` (an object of type `CacheContent<T>`, which includes both the actual data and an `updatedAt` timestamp).
+   * The method determines the correct base directory based on the scope, constructs the full file path, and writes the data as JSON.
+   * If the operation is successful, it returns a Promise that resolves to `true`; otherwise, it resolves to `false`.
+   * This method is asynchronous and should be awaited.
+   * 
    * @template T - The type of the cache content to write.
-   * @param scope - The scope of the cache, either 'user' or workspace.
-   * @param filePath - The relative file path where the cache should be written.
-   * @param data - The cache content to write to the file.
-   * @returns A promise that resolves to `true` if the write operation was successful, otherwise `false`.
+   * 
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/dev/src/managers/classes/CacheManager.ts).
    */
-  public static async WriteCache<T = any>(
+  public static async WriteCache<T = unknown>(
+    scope: CacheScope,
+    filePath: string,
+    data: CacheContent<T>
+  ): Promise<boolean>;
+
+  /**
+   * Example usage:
+   * ```typescript
+   * await CacheManager.WriteCache('user', 'settings/cache.json', { updatedAt: new Date(), data: { theme: 'dark' } });
+   * ```
+   *
+   * For more details on the cache structure, see the [CacheContent type definition](./CacheManager.ts).
+   *
+   * @template T - The type of the cache content to write.
+   * 
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/dev/src/managers/classes/CacheManager.ts).
+   */
+  public static async WriteCache<T = unknown>(
+    scope: CacheScope,
+    filePath: string,
+    data: CacheContent<T>
+  ): Promise<boolean>;
+
+  public static async WriteCache<T = unknown>(
     scope: CacheScope,
     filePath: string,
     data: CacheContent<T>
@@ -159,7 +189,7 @@ export class CacheManager implements CacheScheme {
    * @param filePath - The relative path to the cache file.
    * @returns A promise that resolves to the parsed cache content of type `CacheContent<T>`.
    */
-  public static async ReadCache<T = any>(
+  public static async ReadCache<T = unknown>(
     scope: CacheScope,
     filePath: string,
   ): Promise<CacheContent<T>> {
