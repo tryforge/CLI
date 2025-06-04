@@ -13,8 +13,7 @@
 // External packages.
 import { Command } from 'commander';
 
-// Package.json
-import { version } from '../package.json';
+// Package.json.
 import { CommandRegistry } from './core/classes/CommandRegistry';
 
 /**
