@@ -15,8 +15,6 @@ import { Command } from 'commander';
 
 // Package.json
 import { version } from '../package.json';
-
-// Local modules.
 import { CommandRegistry } from './core/classes/CommandRegistry';
 
 /**
@@ -27,12 +25,8 @@ import { Commands } from './commands';
 /**
  * The main CLI instance for the Forge tool.
  * This object handles command registration and processing of CLI arguments.
- * 
- * @const ForgeCLI
- * @type {Command}
 */
 const ForgeCLI: Command = new Command();
-
 
 /**
  * Configure the CLI with name, description, and version information.
@@ -41,7 +35,11 @@ const ForgeCLI: Command = new Command();
 ForgeCLI
   .name('forge')
   .description('A CLI tool for ForgeScript and BotForge that helps developers quickly set up projects, create scripts, and streamline their workflow.')
-  .version(version);
+  .option('-h, --help', '') // todo: Display custom help message
+  .option('-v, --version', '') // todo: Display custom version message
+  .action(async (options: { help?: boolean, version?: boolean, silent?: boolean }) => {
+    // todo: logic
+  })
 
 
 /**
