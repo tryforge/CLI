@@ -1,4 +1,4 @@
-// Local modules.
+// External packages.
 import { Command } from 'commander';
 
 /**

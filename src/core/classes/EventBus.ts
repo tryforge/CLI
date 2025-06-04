@@ -1,4 +1,4 @@
-// Node.js built-ins
+// Node.js built-ins.
 import { EventEmitter } from 'node:events';
 
 /**
