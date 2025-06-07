@@ -368,7 +368,7 @@ export class CacheManager implements CacheScheme {
   public static async ReadCache<T = unknown>(
     scope: CacheScope,
     filePath: string,
-  ): Promise<CacheContent<T>> {
+  ): Promise<CacheContent<T> | null> {
     const cachePath = scope === 'user'
       ? path.join(FileSystem.GetHomePath(), filePath)
       : path.join(FileSystem.GetWorkspaceDirectory(), filePath);
