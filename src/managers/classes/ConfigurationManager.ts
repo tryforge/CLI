@@ -8,20 +8,49 @@ import { FileSystem } from "./FileSystem";
  * An interface representing how the ConfiguratioManager class is structured.
  */
 interface ConfigurationScheme {
+  /**
+   * The absolute path to the Forge CLI configuration file.
+   */
   ConfigurationPath?: string;
 
   /**
    * Retrieves the configuration object from the configuration file.
    *
+   * This static method reads the configuration file from the path specified by `ConfigurationPath`.
+   * If the file exists, it parses and returns the configuration object of type `T`. If the file does not exist, it returns `null`.
+   * The method is generic, allowing you to specify the expected type of the configuration object.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const config = await ConfigurationManager.GetConfiguration<{ theme: string }>();
+   * if (config) {
+   *   console.log(config.theme);
+   * }
+   * ```
+   *
    * @template T - The expected type of the configuration object.
-   * @returns A promise that resolves to the configuration object of type `T` if the configuration file exists,
-   *          or `null` if the file does not exist.
+   * @returns A promise that resolves to the configuration object of type `T` if the file exists, or `null` otherwise.
    */
   GetConfiguration?<T = any>(): Promise<T | null>;
 
   /**
-   * Asynchronously sets the configuration by writing the provided key-value pairs to a JSON file
-   * at the specified configuration path.
+   * Writes the provided configuration object to the configuration file at the specified path.
+   *
+   * This static method saves the given key-value pairs as a JSON object to the configuration file.
+   * If the operation is successful, it returns `true`; otherwise, it returns `false`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.SetConfiguration({ theme: 'dark', language: 'en' });
+   * ```
    *
    * @param config - An object containing configuration key-value pairs to be saved.
    * @returns A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
@@ -31,12 +60,24 @@ interface ConfigurationScheme {
   ): Promise<boolean>;
 
   /**
-   * Sets a configuration key to the specified value and persists the updated configuration to disk.
+   * Sets a specific configuration key to the provided value and persists the updated configuration to disk.
+   *
+   * This static method updates or adds a key-value pair in the configuration object and writes the updated configuration back to the configuration file.
+   * If the operation is successful, it returns `true`; otherwise, it returns `false`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.SetConfigurationKey('theme', 'light');
+   * ```
    *
    * @template T - The type of the value to set for the configuration key.
-   * @param {string} key - The configuration key to set.
-   * @param {T} value - The value to assign to the configuration key.
-   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
+   * @param key - The configuration key to set or update.
+   * @param value - The value to assign to the configuration key.
+   * @returns A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
    */
   SetConfigurationKey?<T = any>(
     key: string,
@@ -44,66 +85,163 @@ interface ConfigurationScheme {
   ): Promise<boolean>;
 
   /**
-   * Deletes the configuration file if it exists.
+   * Deletes the configuration file if it exists at the specified path.
    *
-   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration file was successfully deleted,
-   * or `false` if the file does not exist or deletion failed.
+   * This static method checks for the existence of the configuration file and deletes it if found.
+   * Returns `true` if the file was successfully deleted, or `false` if the file does not exist or deletion failed.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.DeleteConfiguration();
+   * ```
+   *
+   * @returns A promise that resolves to `true` if the configuration file was deleted, or `false` otherwise.
    */
   DeleteConfiguration?(): Promise<boolean>;
 
   /**
    * Checks whether the configuration file exists at the specified configuration path.
    *
+   * This static method verifies the existence of the configuration file.
+   * Returns `true` if the file exists, or `false` otherwise.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const exists = await ConfigurationManager.ConfigurationExists();
+   * ```
+   *
    * @returns A promise that resolves to `true` if the configuration file exists, or `false` otherwise.
    */
   ConfigurationExists?(): Promise<boolean>;
 
   /**
-   * Retrieves a specific configuration value by its key from the configuration store.
+   * Retrieves the value associated with a specific configuration key from the configuration file.
+   *
+   * This static method reads the configuration object and returns the value for the specified key.
+   * If the key does not exist or the configuration file is missing, it returns `undefined`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const theme = await ConfigurationManager.GetConfigurationKey<string>('theme');
+   * ```
    *
    * @template T - The expected type of the configuration value.
-   * @param {string} key - The key of the configuration value to retrieve.
-   * @returns {Promise<T | undefined>} A promise that resolves to the value associated with the given key,
-   * or `undefined` if the key does not exist or the configuration is not available.
+   * @param key - The key of the configuration value to retrieve.
+   * @returns A promise that resolves to the value for the given key, or `undefined` if not found.
    */
   GetConfigurationKey?<T = any>(
     key: string
   ): Promise<T>;
 
   /**
-   * Retrieves a list of configuration field names.
+   * Returns a list of all configuration field names (keys) present in the configuration file.
    *
-   * This static asynchronous method fetches the current configuration object
-   * and returns an array containing the names of its fields (keys).
+   * This static method fetches the current configuration object and returns an array of its keys.
    * If no configuration is found, it returns an empty array.
    *
-   * @returns {Promise<string[]>} A promise that resolves to an array of configuration field names.
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const fields = await ConfigurationManager.ListConfigurationFields();
+   * console.log(fields); // ['theme', 'language']
+   * ```
+   *
+   * @returns A promise that resolves to an array of configuration field names.
    */
   ListConfigurationFields?(): Promise<string[]>;
 }
 
-
 /**
- * Manages the application's configuration stored in a JSON file.
+ * Manages reading, writing, updating, and deleting the Forge CLI configuration file.
+ *
+ * The `ConfigurationManager` class provides static methods to interact with the Forge CLI configuration,
+ * which is stored as a JSON file in the user's home directory. It supports retrieving the entire configuration,
+ * setting or updating configuration values, deleting the configuration file, checking for its existence,
+ * retrieving individual configuration keys, and listing all configuration fields.
+ *
+ * All methods rely on the `FileSystem` class for file operations.
+ *
+ * @since 0.0.1
+ * @see FileSystem
+ * @see https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts
+ *
+ * @example
+ * ```typescript
+ * // Retrieve the entire configuration
+ * const config = await ConfigurationManager.GetConfiguration<{ theme: string }>();
+ *
+ * // Set a configuration value
+ * await ConfigurationManager.SetConfigurationKey('theme', 'dark');
+ *
+ * // Get a specific configuration value
+ * const theme = await ConfigurationManager.GetConfigurationKey<string>('theme');
+ *
+ * // List all configuration fields
+ * const fields = await ConfigurationManager.ListConfigurationFields();
+ * ```
  */
 export class ConfigurationManager implements ConfigurationScheme {
+  /**
+   * The absolute path to the Forge CLI configuration file.
+   */
   public static ConfigurationPath: string = path.join(FileSystem.GetHomePath(), '.forge', 'config.json');
 
   /**
    * Retrieves the configuration object from the configuration file.
    *
+   * This static method reads the configuration file from the path specified by `ConfigurationPath`.
+   * If the file exists, it parses and returns the configuration object of type `T`. If the file does not exist, it returns `null`.
+   * The method is generic, allowing you to specify the expected type of the configuration object.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const config = await ConfigurationManager.GetConfiguration<{ theme: string }>();
+   * if (config) {
+   *   console.log(config.theme);
+   * }
+   * ```
+   *
    * @template T - The expected type of the configuration object.
-   * @returns A promise that resolves to the configuration object of type `T` if the configuration file exists,
-   *          or `null` if the file does not exist.
+   * @returns A promise that resolves to the configuration object of type `T` if the file exists, or `null` otherwise.
    */
   public static async GetConfiguration<T = any>(): Promise<T | null> {
     if (!(await FileSystem.FileExists(this.ConfigurationPath))) return null;
     return await FileSystem.ReadJSON(this.ConfigurationPath);
-  };
+  }
 
   /**
-   * Asynchronously sets the configuration by writing the provided key-value pairs to a JSON file
-   * at the specified configuration path.
+   * Writes the provided configuration object to the configuration file at the specified path.
+   *
+   * This static method saves the given key-value pairs as a JSON object to the configuration file.
+   * If the operation is successful, it returns `true`; otherwise, it returns `false`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.SetConfiguration({ theme: 'dark', language: 'en' });
+   * ```
    *
    * @param config - An object containing configuration key-value pairs to be saved.
    * @returns A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
@@ -112,66 +250,121 @@ export class ConfigurationManager implements ConfigurationScheme {
     config: Record<string, string>
   ): Promise<boolean> {
     return await FileSystem.WriteJSON(this.ConfigurationPath, config);
-  };
+  }
 
   /**
-   * Sets a configuration key to the specified value and persists the updated configuration to disk.
+   * Sets a specific configuration key to the provided value and persists the updated configuration to disk.
+   *
+   * This static method updates or adds a key-value pair in the configuration object and writes the updated configuration back to the configuration file.
+   * If the operation is successful, it returns `true`; otherwise, it returns `false`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.SetConfigurationKey('theme', 'light');
+   * ```
    *
    * @template T - The type of the value to set for the configuration key.
-   * @param {string} key - The configuration key to set.
-   * @param {T} value - The value to assign to the configuration key.
-   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
+   * @param key - The configuration key to set or update.
+   * @param value - The value to assign to the configuration key.
+   * @returns A promise that resolves to `true` if the configuration was successfully written, or `false` otherwise.
    */
   public static async SetConfigurationKey<T = any>(key: string, value: T): Promise<boolean> {
     let configuration: Record<string, any> = (await this.GetConfiguration()) || {};
     configuration[key] = value;
     return await FileSystem.WriteJSON(this.ConfigurationPath, configuration);
-  };
+  }
 
   /**
-   * Deletes the configuration file if it exists.
+   * Deletes the configuration file if it exists at the specified path.
    *
-   * @returns {Promise<boolean>} A promise that resolves to `true` if the configuration file was successfully deleted,
-   * or `false` if the file does not exist or deletion failed.
+   * This static method checks for the existence of the configuration file and deletes it if found.
+   * Returns `true` if the file was successfully deleted, or `false` if the file does not exist or deletion failed.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * await ConfigurationManager.DeleteConfiguration();
+   * ```
+   *
+   * @returns A promise that resolves to `true` if the configuration file was deleted, or `false` otherwise.
    */
   public static async DeleteConfiguration(): Promise<boolean> {
     if (!(await FileSystem.FileExists(this.ConfigurationPath))) return false;
     return await FileSystem.DeleteFile(this.ConfigurationPath);
-  };
+  }
 
   /**
    * Checks whether the configuration file exists at the specified configuration path.
+   *
+   * This static method verifies the existence of the configuration file.
+   * Returns `true` if the file exists, or `false` otherwise.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const exists = await ConfigurationManager.ConfigurationExists();
+   * ```
    *
    * @returns A promise that resolves to `true` if the configuration file exists, or `false` otherwise.
    */
   public static async ConfigurationExists(): Promise<boolean> {
     return await FileSystem.FileExists(this.ConfigurationPath);
-  };
+  }
 
   /**
-   * Retrieves a specific configuration value by its key from the configuration store.
+   * Retrieves the value associated with a specific configuration key from the configuration file.
+   *
+   * This static method reads the configuration object and returns the value for the specified key.
+   * If the key does not exist or the configuration file is missing, it returns `undefined`.
+   *
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const theme = await ConfigurationManager.GetConfigurationKey<string>('theme');
+   * ```
    *
    * @template T - The expected type of the configuration value.
-   * @param {string} key - The key of the configuration value to retrieve.
-   * @returns {Promise<T | undefined>} A promise that resolves to the value associated with the given key,
-   * or `undefined` if the key does not exist or the configuration is not available.
+   * @param key - The key of the configuration value to retrieve.
+   * @returns A promise that resolves to the value for the given key, or `undefined` if not found.
    */
   public static async GetConfigurationKey<T = any>(key: string): Promise<T | undefined> {
     const configuration = await this.GetConfiguration() as Record<string, any> | null;
     return configuration ? (configuration[key] as T) : undefined;
-  };
+  }
 
   /**
-   * Retrieves a list of configuration field names.
+   * Returns a list of all configuration field names (keys) present in the configuration file.
    *
-   * This static asynchronous method fetches the current configuration object
-   * and returns an array containing the names of its fields (keys).
+   * This static method fetches the current configuration object and returns an array of its keys.
    * If no configuration is found, it returns an empty array.
    *
-   * @returns {Promise<string[]>} A promise that resolves to an array of configuration field names.
+   * Since version: 0.0.1 - This class uses the [FileSystem](https://github.com/tryforge/CLI/blob/main/src/managers/classes/FileSystem.ts) class manager.
+   *
+   * [View on GitHub](https://github.com/tryforge/CLI/blob/main/src/managers/classes/ConfigurationManager.ts)
+   *
+   * Example usage:
+   * ```typescript
+   * const fields = await ConfigurationManager.ListConfigurationFields();
+   * console.log(fields); // ['theme', 'language']
+   * ```
+   *
+   * @returns A promise that resolves to an array of configuration field names.
    */
   public static async ListConfigurationFields(): Promise<string[]> {
     const config = await this.GetConfiguration();
     return config ? Object.keys(config) : [];
-  };
+  }
 }
