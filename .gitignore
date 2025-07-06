@@ -1,10 +1,8 @@
-# Core
 node_modules/
 build/
 *.tsbuildinfo
 .cache/
 
-# IDE & Editor configs
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -14,7 +12,6 @@ build/
 *.sublime-project
 *.sublime-workspace
 
-# Testing & Coverage
 coverage/
 .nyc_output/
 test-results/
@@ -22,26 +19,21 @@ playwright-report/
 blob-report/
 playwright/.cache/
 
-# Environment & Secrets
 .env
 .env.*
 *.env
 *.env.*
 
-# Dependency & lock files
-# Tracking lock files in Git for reproducible builds
 # pnpm-lock.yaml
 # yarn.lock
 # package-lock.json
 
-# OS-generated files
 .DS_Store
 Thumbs.db
 desktop.ini
 ehthumbs.db
 $RECYCLE.BIN/
 
-# Logs and debugging
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -51,7 +43,6 @@ logs/
 debug/
 .pnpm-debug.log*
 
-# Temporary files
 *.tmp
 *.bak
 *.swp
@@ -60,13 +51,10 @@ temp/
 .temp/
 tmp/
 
-# Git
 .git/
 
-# Build
 /*.tgz
 /out/
 
-# Dev folders
 archives/
 storage/
