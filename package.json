@@ -12,7 +12,7 @@
     "dev": "tsup src/index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src --ext .ts",
-    "prepare": "npm run build"
+    "prepare": "pnpm run build"
   },
   "repository": {
     "type": "git",
