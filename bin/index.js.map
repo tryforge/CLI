@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/index.ts"],"sourcesContent":["// Entry point source file\nconsole.log(\"Hello BotForge!\");\n"],"mappings":";AACA,QAAQ,IAAI,iBAAiB;","names":[]}
