@@ -1,2 +1,6 @@
 ignoredBuiltDependencies:
   - esbuild
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - unrs-resolver
