@@ -24,7 +24,7 @@ playwright/.cache/
 *.env
 *.env.*
 
-# pnpm-lock.yaml
+pnpm-lock.yaml
 # yarn.lock
 # package-lock.json
 
