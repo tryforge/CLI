@@ -2,45 +2,84 @@
   "name": "@tryforge/cli",
   "version": "0.0.1",
   "description": "A powerful CLI tool for BotForge & ForgeScript to bootstrap projects, scaffold command files, generate templates, and simplify script setups.",
+  "type": "module",
   "main": "./bin/index.js",
   "types": "./bin/index.d.ts",
   "bin": {
     "forge": "./bin/index.js"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs --target node18 --dts --out-dir bin",
-    "dev": "tsup src/index.ts --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src --ext .ts",
-    "prepare": "pnpm run build"
+    "audit": "npm audit --audit-level=high --json",
+    "build": "tsup src/index.ts --format esm --target node18 --out-dir bin --sourcemap --clean",
+    "build:watch": "tsup src/index.ts --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --runInBand --detectOpenHandles --forceExit",
+    "lint": "eslint . --ext .ts,.js --cache --cache-location ./node_modules/.cache/eslint/",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:staged": "eslint --ext .ts,.js",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "tsc --noEmit --pretty",
+    "prepare": "husky && npm run build && npm run format && npm run typecheck && npm run lint && npm run test",
+    "prepublishOnly": "npm run build",
+    "validate": "npm run typecheck && npm run lint && npm run test:ci"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tryforge/cli.git"
+    "url": "https://github.com/tryforge/CLI.git",
+    "directory": "."
   },
   "keywords": [
     "cli",
     "botforge",
     "forgescript",
-    "forgecli",
+    "forge",
     "discord",
     "typescript",
     "scaffolding",
     "automation",
     "commander",
     "chalk",
-    "ora"
+    "ora",
+    "discord-bot",
+    "discord-js"
   ],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
   "author": "Sébastien GARCIA <sebastien.garcia@mail.com> (https://github.com/Striatp)",
-  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Sébastien GARCIA",
+      "email": "sebastien.garcia@mail.com",
+      "url": "https://github.com/Striatp"
+    }
+  ],
+  "license": "GPL-3.0",
   "engines": {
     "node": ">=18.0.0"
   },
-  "type": "commonjs",
+  "engine-strict": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/tryforge/CLI/issues"
   },
   "homepage": "https://github.com/tryforge/CLI#readme",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/Striatp"
+  },
   "exports": {
     ".": "./bin/index.js"
   },
@@ -48,25 +87,35 @@
     "bin",
     "LICENSE",
     "README.md",
-    "CONTRIBUTE.md"
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CHANGELOG.md"
   ],
+  "sideEffects": false,
   "devDependencies": {
-    "@eslint/js": "^9.26.0",
-    "@types/node": "^20.11.30",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "eslint": "^9.0.0",
-    "globals": "^16.1.0",
+    "@eslint/js": "^9.30.1",
+    "@jest/globals": "30.0.4",
+    "@swc/jest": "0.2.38",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.0.11",
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/parser": "^8.36.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jest": "29.0.1",
+    "eslint-plugin-jsdoc": "51.3.4",
+    "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.0.4",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.2",
+    "ts-jest": "29.4.0",
     "ts-node": "^10.9.2",
-    "tsup": "^8.4.0",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^8.32.1"
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "8.36.0"
   },
   "dependencies": {
-    "@clack/core": "^0.5.0",
-    "@clack/prompts": "^0.11.0",
-    "chalk": "^5.3.0",
-    "commander": "^11.1.0",
-    "ora": "^7.0.1"
+    "commander": "^14.0.0"
   }
 }
