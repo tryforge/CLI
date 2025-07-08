@@ -1,0 +1,6 @@
+{
+    "eslint.format.enable": false,
+    "eslint.options": {
+        "overrideConfigFile": "./eslint.config.mjs"
+    }
+}
