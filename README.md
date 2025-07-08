@@ -13,7 +13,7 @@
   <!-- NPM Registry -->
   <a href="https://npmjs.org/package/@tryforge/cli"><img src="https://img.shields.io/github/package-json/v/tryforge/CLI?label=@tryforge/cli&color=090A16&style=for-the-badge&logo=npm" alt="@tryforge/cli"></a>
   <!-- License -->
-  <a href="https://github.com/tryforge/CLI/README.md"><img src="https://img.shields.io/github/license/tryforge/CLI?style=for-the-badge&logo=github&logoColor=white&label=License&color=090A16" alt="License"/></a>
+  <a href="https://github.com/tryforge/CLI/blob/main/LICENSE"><img src="https://img.shields.io/github/license/tryforge/CLI?style=for-the-badge&logo=github&logoColor=white&label=License&color=090A16" alt="License"/></a>
   <!-- Tests -->
   <a href="https://github.com/tryforge/CLI/actions"><img src="https://img.shields.io/github/actions/workflow/status/tryforge/CLI/ci.yml?branch=main&style=for-the-badge&logo=github&label=Tests" alt="Tests"></a>
   <!-- Codecov -->
