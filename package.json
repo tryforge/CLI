@@ -1,6 +1,6 @@
 {
   "name": "@tryforge/cli",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "A powerful CLI tool for BotForge & ForgeScript to bootstrap projects, scaffold command files, generate templates, and simplify script setups.",
   "type": "module",
   "main": "./bin/index.js",
